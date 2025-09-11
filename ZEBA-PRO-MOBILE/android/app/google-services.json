@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "285769473969",
+    "project_id": "zeba-pro",
+    "storage_bucket": "zeba-pro.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285769473969:android:78d443e2b3f2b14dff2790",
+        "android_client_info": {
+          "package_name": "app.Zeba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2VhSzwSirooc2xJC0zuI64sNy1pHA5WQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285769473969:android:e1e24038b3f0e52bff2790",
+        "android_client_info": {
+          "package_name": "app.Zeba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2VhSzwSirooc2xJC0zuI64sNy1pHA5WQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "ZEBA-PRO-MOBILE",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

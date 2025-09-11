@@ -1,0 +1,21 @@
+:root {
+  --ion-safe-area-top: 0px;
+  --ion-safe-area-bottom: 0px;
+  --ion-safe-area-left: 0px;
+  --ion-safe-area-right: 0px;
+}
+
+ion-header {
+  padding-top: calc(var(--ion-safe-area-top) + var(--safe-area-inset-top));
+}
+
+ion-content {
+  --padding-top: calc(var(--ion-safe-area-top) + var(--safe-area-inset-top));
+  --padding-bottom: calc(var(--ion-safe-area-bottom) + var(--safe-area-inset-bottom));
+  --padding-left: var(--safe-area-inset-left);
+  --padding-right: var(--safe-area-inset-right);
+}
+
+ion-footer {
+  padding-bottom: calc(var(--ion-safe-area-bottom) + var(--safe-area-inset-bottom));
+}
