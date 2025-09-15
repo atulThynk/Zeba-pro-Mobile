@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useIonRouter } from '@ionic/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/utils';
 import { UserRound, LogOut } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from 'framer-motion';
 import { userService, UserProfile } from '@/services/user-service';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface User {
   id: number;
@@ -20,9 +20,13 @@ interface TenantData {
   tenantName: string;
 }
 
-const HomeHeader = () => {
+interface HomeHeaderProps {
+  onProfileClick?: () => void;
+}
+
+const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
   const { user, logout } = useAuth();
-  const navigate = useHistory();
+  const router = useIonRouter();
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fetchedUser, setFetchedUser] = useState<UserProfile | null>(null);
@@ -84,7 +88,7 @@ const HomeHeader = () => {
     try {
       setIsModalOpen(false);
       await logout();
-      navigate.push('/login');
+      router.push('/login');
     } catch (error) {
       console.error('Logout failed:', error);
       toast({
@@ -97,7 +101,10 @@ const HomeHeader = () => {
 
   const handleProfileClick = () => {
     setIsModalOpen(false);
-    navigate.push('/profile');
+    if (onProfileClick) {
+      onProfileClick();
+    }
+    router.push('/profile');
   };
 
   return (
@@ -150,19 +157,6 @@ const HomeHeader = () => {
           </div>
         </header>
       </div>
-
-      <AnimatePresence>
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40"
-            onClick={() => setIsModalOpen(false)}
-          />
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {isModalOpen && (

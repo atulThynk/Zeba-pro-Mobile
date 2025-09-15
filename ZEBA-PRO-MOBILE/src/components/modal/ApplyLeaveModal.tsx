@@ -263,7 +263,7 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
     <DialogContent
       ref={modalRef}
       className={`w-full max-w-md mx-auto p-0 gap-0 rounded-t-3xl md:rounded-2xl ${
-        isKeyboardOpen ? 'fixed inset-0 h-screen overflow-y-auto' : 'max-h-[95vh] overflow-y-auto'
+        isKeyboardOpen ? 'fixed inset-0 h-screen overflow-y-auto' : 'max-h-[85vh] overflow-y-auto'
       }`}
       style={{
         height: isKeyboardOpen ? 'calc(var(--vh, 1vh) * 100)' : undefined,

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const BASE_URL = 'https://dev.thynkcorp.com/backend/api';
+const BASE_URL = 'https://app.zeba.pro/backend/api';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,

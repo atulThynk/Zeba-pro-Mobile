@@ -8,16 +8,20 @@ const config: CapacitorConfig = {
     SafeArea: {
       enabled: true,
       customColorsForSystemBars: true,
-      statusBarColor: '#00000000', // Transparent
-      statusBarContent: 'light', // Light icons/text
-      navigationBarColor: '#00000000', // Transparent (Android)
+      statusBarColor: '#ffffff', // White
+      statusBarContent: 'light', 
+      navigationBarColor: '#ffffff', // White (Android)
       navigationBarContent: 'light',
       offset: 0
     },
     StatusBar: {
-      style: 'DARK', // Dark text/icons
-      backgroundColor: '#00000000', // Transparent
-      overlaysWebView: true // Content under status bar
+      style: 'LIGHT', 
+      backgroundColor: '#ffffff', 
+      overlaysWebView: false 
+    },
+    SplashScreen: {
+      launchShowDuration: 0,
+      launchAutoHide: false
     }
   }
 };

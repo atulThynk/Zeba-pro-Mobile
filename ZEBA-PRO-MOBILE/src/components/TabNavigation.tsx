@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Calendar, LayoutDashboard, Clock, FileText, Bell, ArrowUp } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
+import { Calendar, LayoutDashboard, Clock, FileText, Bell } from 'lucide-react';
 import { LockedFeatureIcon } from './icons/RestrictedAccessIcon';
 
 interface TabNavigationProps {
   unreadNotificationsCount?: number;
 }
 
-// const LockedFeatureIcon: React.FC = () => (
-//   <span
-//     className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-600 shadow-sm"
-//   >
-//     <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" strokeWidth={2} />
-//   </span>
-// );
+const tabOrder: { [key: string]: number } = {
+  '/': 0, // Dashboard
+  '/attendance': 1,
+  '/timeoff': 2,
+  '/payslips': 3,
+  '/notifications': 4,
+};
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount = 0 }) => {
   const location = useLocation();
+  const router = useIonRouter();
   const currentPath = location.pathname;
 
   const isActive = (path: string) => currentPath === path;
@@ -25,12 +27,25 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
   const userData = user ? JSON.parse(user) : null;
   const isTenantOnFreePlan = userData?.isTenantOnFreePlan;
 
-  const RestrictedTab = ({ icon, label, isActiveTab }: { icon: React.ReactNode; label: string; isActiveTab: boolean }) => {
+  const navigateTo = (path: string) => {
+    if (path === currentPath) return; // Prevent navigation to the same path
+    // Use 'none' direction for Dashboard to avoid swipe animations
+    if (path === '/profile' || currentPath === '/') {
+      router.push(path, 'none', 'push');
+    } else {
+      const currentIndex = tabOrder[currentPath] ?? -1;
+      const targetIndex = tabOrder[path] ?? -1;
+      const direction = targetIndex > currentIndex ? 'forward' : 'back';
+      router.push(path, direction, 'push');
+    }
+  };
+
+  const RestrictedTab = ({ icon, label, isActiveTab, path }: { icon: React.ReactNode; label: string; isActiveTab: boolean; path: string }) => {
     const [showTooltip, setShowTooltip] = useState(false);
 
     const handleClick = () => {
       setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 2000); // Hide after 2 seconds
+      setTimeout(() => setShowTooltip(false), 2000);
     };
 
     return (
@@ -41,7 +56,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
         onClick={handleClick}
       >
         <div className="flex items-center gap-1.5">
-          {/* {icon} */}
+          {icon}
           <LockedFeatureIcon />
         </div>
         <span className="text-xs mt-1.5 truncate">{label}</span>
@@ -55,69 +70,74 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
   };
 
   return (
-    <nav className="bg-white fixed bottom-0 left-0 right-0 z-10 shadow-md">
-      <div className="flex justify-between items-center border-t border-[#e4e7eb] max-w-md mx-auto px-2 sm:px-4">
-        <Link
-          to="/"
+    <nav
+      className="bg-white border-t border-[#e4e7eb] fixed bottom-0 left-0 right-0 z-50"
+      style={{ paddingBottom: 'var(--safe-area-inset-bottom, 0px)' }}
+    >
+      <div className="flex justify-between items-center max-w-md mx-auto px-2 sm:px-4">
+        <div
           className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 touch-manipulation ${
             isActive('/') ? 'text-[#6170f6] font-medium' : 'text-gray-500'
           }`}
+          onClick={() => navigateTo('/')}
         >
           <LayoutDashboard className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
           <span className="text-xs mt-1.5 truncate">Dashboard</span>
-        </Link>
-        
+        </div>
+
         {isTenantOnFreePlan ? (
-          <RestrictedTab 
+          <RestrictedTab
             icon={<Clock className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />}
             label="Attendance"
             isActiveTab={isActive('/attendance')}
+            path="/attendance"
           />
         ) : (
-          <Link
-            to="/attendance"
+          <div
             className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 touch-manipulation ${
               isActive('/attendance') ? 'text-[#6170f6] font-medium' : 'text-gray-500'
             }`}
+            onClick={() => navigateTo('/attendance')}
           >
             <Clock className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
             <span className="text-xs mt-1.5 truncate">Attendance</span>
-          </Link>
+          </div>
         )}
-        
+
         {isTenantOnFreePlan ? (
-          <RestrictedTab 
+          <RestrictedTab
             icon={<Calendar className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />}
             label="TimeOff"
             isActiveTab={isActive('/timeoff')}
+            path="/timeoff"
           />
         ) : (
-          <Link
-            to="/timeoff"
+          <div
             className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 touch-manipulation ${
               isActive('/timeoff') ? 'text-[#6170f6] font-medium' : 'text-gray-500'
             }`}
+            onClick={() => navigateTo('/timeoff')}
           >
             <Calendar className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
             <span className="text-xs mt-1.5 truncate">TimeOff</span>
-          </Link>
+          </div>
         )}
-        
-        <Link
-          to="/payslips"
+
+        <div
           className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 touch-manipulation ${
             isActive('/payslips') ? 'text-[#6170f6] font-medium' : 'text-gray-500'
           }`}
+          onClick={() => navigateTo('/payslips')}
         >
           <FileText className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
           <span className="text-xs mt-1.5 truncate">Payslip</span>
-        </Link>
-        
-        <Link
-          to="/notifications"
+        </div>
+
+        <div
           className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 touch-manipulation relative ${
             isActive('/notifications') ? 'text-[#6170f6] font-medium' : 'text-gray-500'
           }`}
+          onClick={() => navigateTo('/notifications')}
         >
           <div className="relative">
             <Bell className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />
@@ -128,9 +148,8 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
             )}
           </div>
           <span className="text-xs mt-1.5 truncate">Notifications</span>
-        </Link>
+        </div>
       </div>
-      <div className="h-[env(safe-area-inset-bottom)] bg-white"></div>
     </nav>
   );
 };
