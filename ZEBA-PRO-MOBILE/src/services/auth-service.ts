@@ -45,6 +45,7 @@ export interface User {
   department?: string;
   profileUrl?: string;
   imageUrl?: string; // Added this field for HomeHeader component
+  currentTenantId?: any; // Changed to any to match API response
 }
 
 export const authService = {

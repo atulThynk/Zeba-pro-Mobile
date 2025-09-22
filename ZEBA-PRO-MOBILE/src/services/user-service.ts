@@ -1,7 +1,8 @@
-import { get } from './api-client';
+import { get, post } from './api-client';
 
 export interface UserProfile {
   id: any;
+  name?: string;
   firstName: string;
   middleName: string | null;
   lastName: string;
@@ -48,24 +49,61 @@ export interface UserProfile {
   lastLogin: string | null;
 }
 
-interface TenantData {
-  logoUrl?: string;
-  tenantName: string;
+export interface TenantData {
+  id: number;
+  name?: any;
+  tenantName?: string;
+  logoUrl?: any;
+  userRole?: number; 
+  isActive?: any; // Added to match Tenant interface
 }
 
-interface ApiResponse<T> {
+export interface Tenant {
+  id: number;
+  name?: any;
+  tenantName?: string;
+  logoUrl?: string; // Optional, as it's not in the API response
+  userRole?: number; // Optional, since it's in the API but not used
+  isActive?: any; // Changed from isTenantActive to match code
+}
+
+export interface ApiResponse<T> {
   data: T;
   message: string;
   statusCode: number;
 }
+export interface SelectTenantResponse {
+  success: boolean;
+  data: any;
+  token: any;
+}
 
 export const userService = {
-  getUserProfile: (userId: string): Promise<UserProfile> => {
-    return get<ApiResponse<UserProfile>>(`/Users/${userId}`)
-      .then(response => response.data);
+  // service
+  getUserProfile: async (userId: string): Promise<UserProfile> => {
+    const response = await get<UserProfile>(`/Users/${userId}`);
+    return response; // no .data because your backend doesn't wrap
   },
+
   getTenantDetails: (): Promise<TenantData> => {
     return get<ApiResponse<TenantData>>('/Tenants')
       .then(response => response.data);
   },
-};
+  getAllTenants: (): Promise<Tenant[]> => {
+    return get<ApiResponse<any[]>>('account/tenants').then((response) =>
+      response.data.map((tenant: any) => ({
+        id: tenant.id,
+        name: tenant.name,
+        isActive: tenant.isTenantActive,
+        userRole: tenant.userRole,
+      }))
+    );
+  },
+  selectTenant: (tenantId: number): Promise<SelectTenantResponse> => {
+    return post<ApiResponse<SelectTenantResponse>>(
+      `/Account/select-tenant?tenantId=${tenantId}`,
+      {}
+    ).then(response => response.data);
+  },
+
+};  

@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 :root {
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
@@ -25,6 +26,7 @@
 main {
   flex: 1;
   overflow-y: auto;
+  background: #ffffff !important; /* Force white background for main content */
 }
 
 body {
@@ -33,10 +35,13 @@ body {
   height: 100vh;
   overflow: hidden;
 }
+
 /* Ensure content doesn't overlap with tab navigation */
 ion-content, .main-content {
   --padding-bottom: calc(60px + var(--safe-area-inset-bottom, 0px));
   padding-bottom: calc(60px + var(--safe-area-inset-bottom, 0px));
+  --background: #ffffff !important; /* Force white background for ion-content */
+  background: #ffffff !important; /* Force white background for main-content */
 }
 
 /* Ensure the app container takes full height */
@@ -55,8 +60,7 @@ main {
 
 /* Fix for Ionic content */
 ion-page > ion-content {
-  --background: #ffffff;
-  --padding-bottom: calc(60px + var(--safe-area-inset-bottom, 0px));
+  --background: #ffffff !important; /* Ensure white background even in dark mode */
 }
 
 /* Ensure toasts appear above tab navigation */
@@ -64,8 +68,9 @@ ion-page > ion-content {
   z-index: 1000;
   bottom: calc(60px + var(--safe-area-inset-bottom, 0px));
 }
+
 .ion-page {
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out; /* Keep only fade animation as per previous request */
 }
 
 nav {
@@ -88,6 +93,7 @@ nav {
   padding: 2px 6px;
   font-size: 10px;
 }
+
 @keyframes netflix-logo {
   0% {
     transform: translateX(-100%) scale(0.95);

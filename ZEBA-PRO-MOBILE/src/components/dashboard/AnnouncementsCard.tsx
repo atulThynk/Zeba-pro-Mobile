@@ -22,16 +22,16 @@ const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ announcements, is
 
   if (isLoading) {
     return (
-      <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6">
-        <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 dark:text-gray-100">
+      <Card className="border border-[#e4e7eb] bg-white  mb-6">
+        <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+          <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 ">
             <div>Announcements</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">This Month</div>
+            <div className="text-xs text-gray-500 ">This Month</div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600 dark:text-gray-300 text-sm">Loading announcements...</p>
+            <p className="text-gray-600  text-sm">Loading announcements...</p>
           </div>
         </CardContent>
       </Card>
@@ -39,11 +39,11 @@ const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ announcements, is
   }
 
   return (
-    <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6 relative">
-      <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 dark:text-gray-100">
+    <Card className="border border-[#e4e7eb] bg-white  mb-6 relative">
+      <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+        <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 ">
           <div>Announcements</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">This Month</div>
+          <div className="text-xs text-gray-500 ">This Month</div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -67,9 +67,9 @@ const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ announcements, is
               <div key={announcement.id} className="flex items-center justify-between py-1">
                 <div className="flex items-center">
                   <MicVocal size={20} className="text-purple-500 mr-2" />
-                  <span className="text-sm text-gray-900 dark:text-gray-100">{announcement.title}</span>
+                  <span className="text-sm text-gray-900 ">{announcement.title}</span>
                 </div>
-                <span className="text-xs text-gray-600 dark:text-gray-300">
+                <span className="text-xs text-gray-600 ">
                   {formatDate(new Date(announcement.date))}
                 </span>
               </div>
@@ -78,7 +78,7 @@ const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ announcements, is
         ) : (
           <div className="h-[100px] flex flex-col items-center justify-center">
             <Calendar size={40} className="text-[#D1E3FE]" />
-            <p className="text-gray-600 dark:text-gray-300 text-sm">No announcements</p>
+            <p className="text-gray-600  text-sm">No announcements</p>
           </div>
         )}
       </CardContent>

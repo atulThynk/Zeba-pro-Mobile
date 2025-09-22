@@ -119,7 +119,7 @@ export const dashboardService = {
   },
 
   getUserData: async (): Promise<UserData> => {
-    let userId = '1'; // Fallback ID
+    let userId = null; // Fallback ID
     const userString = localStorage.getItem('user');
     if (userString) {
       try {

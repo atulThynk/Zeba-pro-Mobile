@@ -13,23 +13,23 @@ interface BirthdaysCardProps {
 const BirthdaysCard: React.FC<BirthdaysCardProps> = ({ birthdays, isLoading }) => {
   if (isLoading) {
     return (
-      <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6">
-        <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <CardTitle className="text-sm font-bold-300 flex justify-between items-center text-gray-900 dark:text-gray-100">
+      <Card className="border border-[#e4e7eb] bg-white  mb-6">
+        <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+          <CardTitle className="text-sm font-bold-300 flex justify-between items-center text-gray-900 ">
             {/* <CakeSlice size={16} className="mr-2" /> */}
             
             <div>
             
             Birthdays
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-500 ">
             This Month
           </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600 dark:text-gray-300 text-sm">Loading birthdays...</p>
+            <p className="text-gray-600  text-sm">Loading birthdays...</p>
           </div>
         </CardContent>
       </Card>
@@ -37,13 +37,13 @@ const BirthdaysCard: React.FC<BirthdaysCardProps> = ({ birthdays, isLoading }) =
   }
 
   return (
-    <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6">
-      <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <CardTitle className="text-sm font-bold-300 flex justify-between items-center text-gray-900 dark:text-gray-100">
+    <Card className="border border-[#e4e7eb] bg-white  mb-6">
+      <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+        <CardTitle className="text-sm font-bold-300 flex justify-between items-center text-gray-900 ">
            <div>
             Birthdays
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-500 ">
             This Month
           </div>
         </CardTitle>
@@ -55,13 +55,13 @@ const BirthdaysCard: React.FC<BirthdaysCardProps> = ({ birthdays, isLoading }) =
               <div key={birthday.userId} className="flex items-center">
                 <Avatar className="h-8 w-8 mr-3">
                   <AvatarImage src={birthday.avatar} alt={birthday.name} />
-                  <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-gray-100">
+                  <AvatarFallback className="bg-gray-200  text-gray-900 ">
                     {getInitials(birthday.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="text-sm font-bold-300 text-gray-900 dark:text-gray-100">{birthday.name}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-300">
+                  <p className="text-sm font-bold-300 text-gray-900 ">{birthday.name}</p>
+                  <p className="text-xs text-gray-600 ">
                     {formatDate(new Date(birthday.date))}
                   </p>
                 </div>
@@ -71,7 +71,7 @@ const BirthdaysCard: React.FC<BirthdaysCardProps> = ({ birthdays, isLoading }) =
         ) : (
           <div className="h-[100px] flex flex-col items-center justify-center">
             <CakeSlice size={40} className='text-[#D1E3FE]' /> 
-            <p className="text-gray-600 dark:text-gray-300 text-sm">No birthdays</p>
+            <p className="text-gray-600 text-sm">No birthdays</p>
           </div>
         )}
       </CardContent>

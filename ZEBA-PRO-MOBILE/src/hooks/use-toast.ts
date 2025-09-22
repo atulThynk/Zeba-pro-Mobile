@@ -156,7 +156,7 @@ function toast({ ...props }: Toast) {
       onOpenChange: (open) => {
         if (!open) dismiss()
       },
-      className:"fixed bottom-16 left-1/2 transform -translate-x-1/2 !rounded-2xl !shadow-md bg-gray-100 border-0 p-4 shadow-lg hrm-toastw-auto max-w-[90%] flex justify-center items-center",
+      className:"fixed bottom-16 left-1/2 transform -translate-x-1/2 !rounded-2xl !shadow-md !bg-gray-100 border-0 p-4 shadow-lg hrm-toastw-auto max-w-[90%] flex justify-center items-center",
     },
   })
 

@@ -35,15 +35,15 @@ const AnniversariesCard: React.FC<AnniversariesCardProps> = ({ anniversaries, is
 
   if (isLoading) {
     return (
-      <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6">
-        <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <CardTitle className="text-sm font-bold-300 flex items-center text-gray-900 dark:text-gray-100">
+      <Card className="border border-[#e4e7eb] bg-white  mb-6">
+        <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+          <CardTitle className="text-sm font-bold-300 flex items-center text-gray-900 ">
             Work Anniversary
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600 dark:text-gray-300 text-sm">Loading anniversaries...</p>
+            <p className="text-gray-600  text-sm">Loading anniversaries...</p>
           </div>
         </CardContent>
       </Card>
@@ -51,11 +51,11 @@ const AnniversariesCard: React.FC<AnniversariesCardProps> = ({ anniversaries, is
   }
 
   return (
-    <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6">
-      <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <CardTitle className="text-sm font-bold-300 flex justify-between items-center text-gray-900 dark:text-gray-100">
+    <Card className="border border-[#e4e7eb] bg-white  mb-6">
+      <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+        <CardTitle className="text-sm font-bold-300 flex justify-between items-center text-gray-900 ">
           <div>Work Anniversary</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">This Month</div>
+          <div className="text-xs text-gray-500 ">This Month</div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -65,15 +65,15 @@ const AnniversariesCard: React.FC<AnniversariesCardProps> = ({ anniversaries, is
               <div key={anniversary.userId} className="flex items-center">
                 <Avatar className="h-8 w-8 mr-3">
                   <AvatarImage src={anniversary.avatar ?? ""} alt={anniversary.name} />
-                  <AvatarFallback className="bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-gray-100">
+                  <AvatarFallback className="bg-gray-200  text-gray-900 ">
                     {getInitials(anniversary.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="text-sm font-bold-300 text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-bold-300 text-gray-900 ">
                     {anniversary.name}
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-300">
+                  <p className="text-xs text-gray-600 ">
                     {formatAnniversaryText(anniversary)}
                   </p>
                 </div>
@@ -83,7 +83,7 @@ const AnniversariesCard: React.FC<AnniversariesCardProps> = ({ anniversaries, is
         ) : (
           <div className="h-[100px] flex flex-col items-center justify-center">
             <Wine size={40} className="text-[#D1E3FE]" />
-            <p className="text-gray-400 dark:text-gray-300 text-sm">No work anniversary</p>
+            <p className="text-gray-400  text-sm">No work anniversary</p>
           </div>
         )}
       </CardContent>

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Route, Redirect, useLocation } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -45,6 +45,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 import './theme/variables.css';
 import './index.css';
 import { notificationService } from './services/notification-service';
+import TenantListPage from './components/TenantListPage';
 
 // Initialize Ionic React with proper config
 setupIonicReact({
@@ -64,34 +65,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Define tab order for determining navigation direction
-const tabOrder: { [key: string]: number } = {
-  '/': 0, // Dashboard
-  '/attendance': 1,
-  '/timeoff': 2,
-  '/payslips': 3,
-  '/notifications': 4,
-};
-
-// Custom animations
-const forwardAnimation = (baseEl: HTMLElement): Animation => {
-  return createAnimation()
-    .addElement(baseEl.querySelector('.ion-page')!)
-    .duration(300)
-    .easing('ease-in-out')
-    .fromTo('transform', 'translateX(100%)', 'translateX(0)')
-    .fromTo('opacity', 0.2, 1);
-};
-
-const backwardAnimation = (baseEl: HTMLElement): Animation => {
-  return createAnimation()
-    .addElement(baseEl.querySelector('.ion-page')!)
-    .duration(300)
-    .easing('ease-in-out')
-    .fromTo('transform', 'translateX(-100%)', 'translateX(0)')
-    .fromTo('opacity', 0.2, 1);
-};
-
+// Custom fade animation
 const fadeAnimation = (baseEl: HTMLElement): Animation => {
   return createAnimation()
     .addElement(baseEl.querySelector('.ion-page')!)
@@ -104,10 +78,16 @@ const AppContent: React.FC = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { isInitialized, error } = usePushNotifications();
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-  const [animation, setAnimation] = useState<(baseEl: HTMLElement) => Animation>(() => fadeAnimation);
   const [showSplash, setShowSplash] = useState(true);
-  const location = useLocation();
-  const prevPathRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Check if app has launched before
+    const hasLaunchedBefore = localStorage.getItem('appLaunchedBefore');
+    if (hasLaunchedBefore) {
+      setShowSplash(false);
+    }
+    // If not, keep showSplash true and handle setting the flag in handleSplashComplete
+  }, []);
 
   useEffect(() => {
     const fetchNotificationsCount = async () => {
@@ -195,24 +175,6 @@ const AppContent: React.FC = () => {
     }
   }, [isInitialized, error]);
 
-  // Handle navigation direction
-  useEffect(() => {
-    const currentPath = location.pathname;
-    if (prevPathRef.current !== null) {
-      const currentIndex = tabOrder[currentPath] ?? -1;
-      const prevIndex = tabOrder[prevPathRef.current] ?? -1;
-      // Use fade animation for Dashboard (/) route
-      if (currentIndex > prevIndex && currentIndex !== -1 && prevIndex !== -1) {
-        setAnimation(() => forwardAnimation);
-      } else if (currentIndex < prevIndex && currentIndex !== -1 && prevIndex !== -1) {
-        setAnimation(() => backwardAnimation);
-      } else {
-        setAnimation(() => fadeAnimation); // Fallback for non-tab routes
-      }
-    }
-    prevPathRef.current = currentPath;
-  }, [location.pathname]);
-
   // Handle app state changes and notification navigation
   useEffect(() => {
     const handleNavigateToAttendance = () => {
@@ -249,6 +211,8 @@ const AppContent: React.FC = () => {
   }, []);
 
   const handleSplashComplete = () => {
+    // Set flag only on first launch
+    localStorage.setItem('appLaunchedBefore', 'true');
     setShowSplash(false);
   };
 
@@ -283,7 +247,7 @@ const AppContent: React.FC = () => {
             }}
           />
           <div className="flex-1 overflow-y-auto">
-            <IonRouterOutlet animation={animation}>
+            <IonRouterOutlet animation={fadeAnimation}>
               <Route exact path="/login" component={AnimatedLogin} />
               <Route
                 exact
@@ -336,6 +300,15 @@ const AppContent: React.FC = () => {
                 render={() => (
                   <ProtectedRoute>
                     <ProfilePage />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route
+                exact
+                path="/tenants"
+                render={() => (
+                  <ProtectedRoute>
+                    <TenantListPage />
                   </ProtectedRoute>
                 )}
               />

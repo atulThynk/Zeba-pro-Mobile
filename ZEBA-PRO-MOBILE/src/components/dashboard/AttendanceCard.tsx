@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Calendar, TimerReset, Hourglass, Loader2 } from 'lucide-react';
-import { attendanceService, AttendanceRecord } from '@/services/attendance-service';
+import { attendanceService, AttendanceRecord, CheckInRequest, CheckOutRequest } from '@/services/attendance-service';
 import { formatTime } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
+import { Geolocation } from '@capacitor/geolocation';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
 interface AttendanceCardProps {
   attendance: AttendanceRecord | null;
   onCheckInOut: () => void;
-  isDataLoading?: boolean; // New prop to indicate if data is being fetched
+  isDataLoading?: boolean;
 }
 
 const AttendanceCard: React.FC<AttendanceCardProps> = ({ 
@@ -28,26 +31,106 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  const requestLocationPermission = async (): Promise<boolean> => {
+    try {
+      const permissionStatus = await Geolocation.requestPermissions();
+      
+      if (permissionStatus.location === 'granted' || permissionStatus.coarseLocation === 'granted') {
+        return true;
+      } else {
+        toast({
+          description: 'Location permission denied. Please enable it in settings to use this feature.',
+          variant: 'destructive',
+          duration: 5000,
+         
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Error requesting location permissions:', error);
+      toast({
+        description: 'Error requesting location permissions. Please check your device settings.',
+        variant: 'destructive',
+        duration: 5000,
+        
+      });
+      return false;
+    }
+  };
+
+  const getCurrentPosition = async (): Promise<{latitude: number; longitude: number} | null> => {
+    try {
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      };
+    } catch (error: any) {
+      console.error('Error getting location:', error);
+      let errorMessage = 'Failed to get location. Please try again.';
+      
+      // Handle specific error codes for better user feedback
+      if (error.code === 1) { // PERMISSION_DENIED
+        errorMessage = 'Location permission denied. Please enable it in settings.';
+      } else if (error.code === 2) { // POSITION_UNAVAILABLE
+        errorMessage = 'Location services are unavailable. Please enable location services in your device settings.';
+      } else if (error.code === 3) { // TIMEOUT
+        errorMessage = 'Location request timed out. Please try again.';
+      }
+      
+      toast({
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 5000,
+      });
+      return null;
+    }
+  };
+
   const handleCheckInOut = async () => {
     setIsLoading(true);
+    
     try {
-      if (getCurrentSessionTime() !== "00:00:00") {
-        // Check out
-        await attendanceService.checkOut({});
-        toast({
-          description: "Successfully checked out",
-          variant: "default",
-          duration: 3000,
-        });
-      } else {
-        // Check in
-        await attendanceService.checkIn({});
-        toast({
-          description: "Successfully checked in",
-          variant: "default",
-          duration: 3000,
-        });
+      let location = null;
+      
+      // Only attempt to get location on native platforms
+      if (Capacitor.isNativePlatform()) {
+        // Always request permission on check-in, regardless of previous status
+        const permissionGranted = await requestLocationPermission();
+        if (!permissionGranted) {
+          setIsLoading(false);
+          return;
+        }
+        
+        // Get current position
+        location = await getCurrentPosition();
+        if (!location) {
+          setIsLoading(false);
+          return;
+        }
       }
+
+      const isCheckedIn = getCurrentSessionTime() !== "00:00:00";
+      const request: CheckInRequest | CheckOutRequest = {
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+        isMobileCheckIn: Capacitor.isNativePlatform()
+      };
+
+      const response = isCheckedIn 
+        ? await attendanceService.checkOut(request)
+        : await attendanceService.checkIn(request);
+
+      toast({
+        description: response.message || (isCheckedIn ? "Successfully checked out" : "Successfully checked in"),
+        variant: "default",
+        duration: 3000,
+      });
+
       onCheckInOut();
     } catch (error) {
       console.error("Failed to update attendance:", error);
@@ -91,40 +174,40 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
   const isCheckedIn = getCurrentSessionTime() !== "00:00:00";
 
   return (
-    <Card className="border-gray-100 bg-white dark:bg-gray-800 mb-6 overflow-hidden rounded-xl">
-      <CardHeader className="flex justify-center items-center py-4 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <CardTitle className="text-lg font-medium flex items-center text-gray-800 dark:text-gray-100">
+    <Card className="border-gray-100 bg-white mb-6 overflow-hidden rounded-xl">
+      <CardHeader className="flex justify-center items-center py-4 border-gray-100 bg-white">
+        <CardTitle className="text-lg font-medium flex items-center text-gray-800">
           Today's Attendance
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="grid grid-cols-2 mb-3">
-          <div className="text-center p-4 border-gray-100 bg-white dark:bg-gray-700 rounded-lg">
+          <div className="text-center p-4 border-gray-100 bg-white rounded-lg">
             <div className="flex items-center justify-center mb-2">
               <TimerReset size={20} className="text-emerald-500 mr-2" />
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Hours</p>
+              <p className="text-sm font-medium text-gray-600">Total Hours</p>
             </div>
             {isDataLoading ? (
               <div className="flex items-center justify-center">
                 <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
               </div>
             ) : (
-              <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <p className="text-xl font-semibold text-gray-800">
                 {formatTotalHours(attendance?.totalHours)}
               </p>
             )}
           </div>
-          <div className="text-center p-4 bg-white dark:bg-gray-700 rounded-lg">
+          <div className="text-center p-4 bg-white rounded-lg">
             <div className="flex items-center justify-center mb-2">
               <Hourglass size={20} className="text-blue-500 mr-2" />
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Session Time</p>
+              <p className="text-sm font-medium text-gray-600">Session Time</p>
             </div>
             {isDataLoading ? (
               <div className="flex items-center justify-center">
                 <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
               </div>
             ) : (
-              <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <p className="text-xl font-semibold text-gray-800">
                 {getCurrentSessionTime()}
               </p>
             )}
@@ -132,9 +215,9 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
         </div>
         <div className="w-full flex justify-center text-right items-right mb-3">
           {isDataLoading ? (
-            <div className="w-32 py-2 flex items-center justify-center bg-gray-300 dark:bg-gray-600 rounded-full">
-              <Loader2 className="animate-spin h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" />
-              <span className="text-sm text-gray-500 dark:text-gray-400">Loading...</span>
+            <div className="w-32 py-2 flex items-center justify-center bg-gray-300 rounded-full">
+              <Loader2 className="animate-spin h-4 w-4 text-gray-500 mr-2" />
+              <span className="text-sm text-gray-500">Loading...</span>
             </div>
           ) : (
             <Button 

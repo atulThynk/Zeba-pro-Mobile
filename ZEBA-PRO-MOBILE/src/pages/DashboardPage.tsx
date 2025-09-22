@@ -13,6 +13,7 @@ import type { WorkAnniversary } from '@/services/dashboard-service';
 import { attendanceService, AttendanceRecord } from '../services/attendance-service';
 import { dashboardService, Announcement, Holiday, Birthday } from '../services/dashboard-service';
 import { notificationService } from '../services/notification-service';
+import { userService } from '@/services/user-service';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -26,7 +27,7 @@ const DashboardPage: React.FC = () => {
   const [anniversaries, setAnniversaries] = useState<WorkAnniversary[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-
+  const userData =JSON.parse(localStorage.getItem('user') || '{}');
   const [isLoading, setIsLoading] = useState({
     attendance: true,
     announcements: true,
@@ -67,11 +68,25 @@ const DashboardPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    fetchDashboardData();
-    const interval = setInterval(fetchDashboardData, 300000);
-    return () => clearInterval(interval);
-  }, []);
+useEffect(() => {
+  const fetchData = async () => {
+    await fetchDashboardData();
+
+    try {
+      const tenantData = await userService.getTenantDetails();
+      const logoUrl = tenantData.logoUrl || '';
+      localStorage.setItem('tenantLogo', logoUrl);
+      localStorage.setItem('tenantName', tenantData.name || 'Unknown Tenant');
+    } catch (error) {
+      console.error("Failed to fetch tenant details:", error);
+    }
+  };
+
+  fetchData();
+
+  const interval = setInterval(fetchDashboardData, 300000);
+  return () => clearInterval(interval);
+}, []);
 
   const formatTotalHours = (totalHours: string | undefined): string => {
     if (!totalHours) return "00:00";
@@ -107,7 +122,7 @@ const DashboardPage: React.FC = () => {
           
           <main className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
             <div className="mb-6">
-              <h1 className="text-2xl text-black font-bold">Hello, {user?.name || 'User'}</h1>
+              <h1 className="text-2xl text-black font-bold">Hello, {userData?.firstName || 'User'}</h1>
             </div>
             
             <AttendanceCard 

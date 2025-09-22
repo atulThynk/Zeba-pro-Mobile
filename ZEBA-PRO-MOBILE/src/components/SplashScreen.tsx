@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import logoImage from '../public/assets/zebaLight.png';
+import logoImage from '../public/assets/zebaDark.png';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -15,7 +15,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
       <div
         className="animate-netflix-logo"
         style={{

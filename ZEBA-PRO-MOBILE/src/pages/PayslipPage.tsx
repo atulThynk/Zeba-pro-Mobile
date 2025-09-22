@@ -181,7 +181,7 @@ const PayslipPage: React.FC = () => {
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal bg-white border-gray-200",
+                        "w-full justify-start text-left font-normal bg-gray-100 border-gray-200",
                         !date && "text-gray-500"
                       )}
                     >

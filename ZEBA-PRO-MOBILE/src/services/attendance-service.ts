@@ -23,6 +23,7 @@ export interface CheckInRequest {
   latitude?: number;
   longitude?: number;
   deviceId?: string;
+  isMobileCheckIn?: boolean;
 }
 
 export interface CheckOutRequest {

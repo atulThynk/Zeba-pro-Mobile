@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import logoImage from '../public/assets/zebaLight.png';
+import logoImage from '../public/assets/zebaDark.png';
 import { toast } from '@/hooks/use-toast';
 
 const LoginPage = () => {
@@ -116,12 +116,12 @@ const LoginPage = () => {
 
   return (
     <div
-      className="min-h-screen bg-center flex items-center justify-center p-4 bg-gradient-to-t from-black to-gray-800"
+      className="min-h-screen bg-center flex items-center justify-center p-4 bg-gradient-to-t from-gray-500 to-white"
     >
       {showEmailForm && (
         <button
           onClick={goBack}
-          className="absolute top-4 left-4 flex items-center text-gray-400 hover:text-white transition-colors duration-200 ease-in-out mt-10"
+          className="absolute top-4 left-4 flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-200 ease-in-out mt-10"
           aria-label="Back to sign in options"
         >
           <ArrowLeft className="h-5 w-5 mr-2" />
@@ -129,19 +129,19 @@ const LoginPage = () => {
       )}
 
       {!showEmailForm ? (
-        <div className="w-full max-w-md animate-fade-in bg-opacity-80 rounded-md p-8 text-white relative">
+        <div className="w-full max-w-md animate-fade-in bg-opacity-80 rounded-md p-8 text-gray-900 relative">
           <div className="space-y-6">
             <div>
               <img src={logoImage} alt="Logo" className="h-28 w-auto mx-auto mb-32" />
             </div>
             <div>
               <h1 className="text-3xl text-center mb-2">Welcome Back</h1>
-              <h1 className="text-sm text-center mb-8 text-gray-400">Log in to your zeba account to continue</h1>
+              <h1 className="text-sm text-center mb-8 text-gray-500">Log in to your zeba account to continue</h1>
             </div>
 
             {/* <Button
               type="button"
-              className="w-full bg-gray-700 hover:bg-gray-200 text-white py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out"
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out "
               onClick={handleGoogleLogin}
               disabled={isSubmitting}
             >
@@ -158,11 +158,11 @@ const LoginPage = () => {
                 <path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81Z" />
               </svg>
               Sign in with Google
-            </Button>
+            </Button> */}
 
-            <Button
+            {/* <Button
               type="button"
-              className="w-full bg-white hover:bg-gray-200 text-black py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out"
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out "
               onClick={handleMicrosoftLogin}
               disabled={isSubmitting}
             >
@@ -177,7 +177,7 @@ const LoginPage = () => {
 
             <Button
               type="button"
-              className="w-full bg-blue-500 hover:bg-red-700 text-white py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out shadow-lg"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out "
               onClick={() => setShowEmailForm(true)}
               disabled={isSubmitting}
             >
@@ -187,11 +187,11 @@ const LoginPage = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full min-h-screen max-w-md animate-fade-in bg-opacity-80 rounded-md p-8 text-white shadow-xl relative mt-16">
+        <div className="w-full min-h-screen max-w-md animate-fade-in bg-opacity-80 rounded-md p-8 text-gray-900 relative mt-16">
           <div className="pt-4">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1">
-                <label htmlFor="email" className="text-sm font-medium text-gray-300">
+                <label htmlFor="email" className="text-sm font-medium text-gray-600">
                   Email
                 </label>
                 <Input
@@ -202,12 +202,12 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoFocus
-                  className="!bg-black border-none text-white py-3 px-4 !rounded-3xl w-full focus:ring-2 focus:ring-blue-500 border-gray-200 focus:outline-none"
+                  className="!bg-gray-50 border-none text-gray-900 py-3 px-4 !rounded-3xl w-full focus:ring-2 focus:ring-blue-600 border-gray-300 focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label htmlFor="password" className="text-sm font-medium text-gray-300">
+                <label htmlFor="password" className="text-sm font-medium text-gray-600">
                   Password
                 </label>
                 <div className="relative">
@@ -218,7 +218,7 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="!bg-black border-none text-white py-3 px-4 !rounded-3xl w-full pr-10 focus:ring-2 focus:ring-blue-500 border-gray-200 focus:outline-none"
+                    className="!bg-gray-50 border-none text-gray-900 py-3 px-4 !rounded-3xl w-full pr-10 focus:ring-2 focus:ring-blue-600 border-gray-300 focus:outline-none"
                   />
                   <button
                     type="button"
@@ -226,9 +226,9 @@ const LoginPage = () => {
                     onClick={toggleShowPassword}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
+                      <EyeOff className="h-4 w-4 text-gray-500" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
+                      <Eye className="h-4 w-4 text-gray-500" />
                     )}
                   </button>
                 </div>
@@ -236,7 +236,7 @@ const LoginPage = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out shadow-lg"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 !rounded-3xl font-medium transition-colors duration-200 ease-in-out "
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Signing In...' : 'Sign In'}

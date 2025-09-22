@@ -23,16 +23,16 @@ const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, isLoading }) => {
 
   if (isLoading) {
     return (
-      <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6">
-        <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 dark:text-gray-100">
+      <Card className="border border-[#e4e7eb] bg-white  mb-6">
+        <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+          <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 ">
             <div>Upcoming Holidays</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">This Month</div>
+            <div className="text-xs text-gray-500 ">This Month</div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600 dark:text-gray-300 text-sm">Loading holidays...</p>
+            <p className="text-gray-600 text-sm">Loading holidays...</p>
           </div>
         </CardContent>
       </Card>
@@ -40,11 +40,11 @@ const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, isLoading }) => {
   }
 
   return (
-    <Card className="border border-[#e4e7eb] bg-white dark:bg-gray-800 mb-6 relative">
-      <CardHeader className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 dark:text-gray-100">
+    <Card className="border border-[#e4e7eb] bg-white  mb-6 relative">
+      <CardHeader className="px-4 py-3 border-b border-gray-200 ">
+        <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 ">
           <div>Upcoming Holidays</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">This Month</div>
+          <div className="text-xs text-gray-500 ">This Month</div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -72,9 +72,9 @@ const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, isLoading }) => {
                 <div key={holiday.id} className="flex items-center justify-between py-1">
                   <div className="flex items-center">
                     <Icon size={20} className="mr-2" style={{ color: iconColor }} />
-                    <span className="text-sm text-gray-900 dark:text-gray-100">{holiday.name}</span>
+                    <span className="text-sm text-gray-900 ">{holiday.name}</span>
                   </div>
-                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                  <span className="text-xs text-gray-600 ">
                     {formatDate(new Date(holiday.date))}
                   </span>
                 </div>
@@ -84,7 +84,7 @@ const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, isLoading }) => {
         ) : (
           <div className="h-[100px] flex flex-col items-center justify-center">
             <Calendar size={40} className="text-[#D1E3FE]" />
-            <p className="text-gray-600 dark:text-gray-300 text-sm">No holidays</p>
+            <p className="text-gray-600  text-sm">No holidays</p>
           </div>
         )}
       </CardContent>
