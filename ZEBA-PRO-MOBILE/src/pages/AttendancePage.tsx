@@ -216,7 +216,7 @@ const AttendancePage: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.get<ApiResponse<AttendanceRecord[]>>('https://app.zeba.pro//api/Attendances', {
+      const response = await axios.get<ApiResponse<AttendanceRecord[]>>('https://app.zeba.pro/backend/api/Attendances', {
         params: {
           startDate: apiStartDate,
           endDate: apiEndDate,

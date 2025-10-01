@@ -26,7 +26,7 @@ const NotificationsPage: React.FC = () => {
     const fetchNotifications = async () => {
       const token = localStorage.getItem('auth_token');
       try {
-        const response = await fetch('https://app.zeba.pro//api/notifications?pageNo=1', {
+        const response = await fetch('https://app.zeba.pro/backend/api/notifications?pageNo=1', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
