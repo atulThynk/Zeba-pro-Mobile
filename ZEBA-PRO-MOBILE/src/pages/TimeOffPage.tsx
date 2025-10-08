@@ -129,7 +129,7 @@ const TimeOffPage: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white text-gray-800">
-          <HomeHeader />
+     
           <main className="p-4 max-w-4xl mx-auto pb-20">
             <div className="mb-6 flex justify-between items-center">
               <h1 className="text-2xl font-medium text-black">Time Off</h1>

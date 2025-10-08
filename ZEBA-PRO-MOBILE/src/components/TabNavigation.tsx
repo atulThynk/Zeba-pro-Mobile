@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useIonRouter } from '@ionic/react';
-import { Calendar, LayoutDashboard, Clock, FileText, Bell } from 'lucide-react';
+import { Calendar, LayoutDashboard, Clock, FileText, Bell, X, ShieldAlert,AlertTriangle } from 'lucide-react';
 import { LockedFeatureIcon } from './icons/RestrictedAccessIcon';
 
 interface TabNavigationProps {
@@ -26,6 +26,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
   const user = localStorage.getItem('user');
   const userData = user ? JSON.parse(user) : null;
   const isTenantOnFreePlan = userData?.isTenantOnFreePlan;
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const navigateTo = (path: string) => {
     if (path === currentPath) return; // Prevent navigation to the same path
@@ -40,34 +41,19 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
     }
   };
 
-  const RestrictedTab = ({ icon, label, isActiveTab, path }: { icon: React.ReactNode; label: string; isActiveTab: boolean; path: string }) => {
-    const [showTooltip, setShowTooltip] = useState(false);
-
-    const handleClick = () => {
-      setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 2000);
-    };
-
-    return (
-      <div
-        className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 cursor-not-allowed opacity-90 relative ${
-          isActiveTab ? 'text-[#6170f6] font-medium' : 'text-gray-500'
-        }`}
-        onClick={handleClick}
-      >
-        <div className="flex items-center gap-1.5">
-          {icon}
-          <LockedFeatureIcon />
-        </div>
-        <span className="text-xs mt-1.5 truncate">{label}</span>
-        {showTooltip && (
-          <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 shadow-lg">
-            Premium Feature
-          </div>
-        )}
-      </div>
-    );
-  };
+const RestrictedTab = ({ icon, label, isActiveTab }: { icon: React.ReactNode; label: string; isActiveTab: boolean }) => {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center py-2.5 flex-1 min-w-0 touch-manipulation ${
+        isActiveTab ? 'text-[#6170f6] font-medium' : 'text-gray-500'
+      }`}
+      onClick={() => setShowPremiumModal(true)}
+    >
+      {icon}
+      <span className="text-xs mt-1.5 truncate">{label}</span>
+    </div>
+  );
+};
 
   return (
     <nav
@@ -90,7 +76,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
             icon={<Clock className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />}
             label="Attendance"
             isActiveTab={isActive('/attendance')}
-            path="/attendance"
+          
           />
         ) : (
           <div
@@ -109,7 +95,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
             icon={<Calendar className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={1.5} />}
             label="TimeOff"
             isActiveTab={isActive('/timeoff')}
-            path="/timeoff"
+           
           />
         ) : (
           <div
@@ -150,7 +136,44 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ unreadNotificationsCount 
           <span className="text-xs mt-1.5 truncate">Notifications</span>
         </div>
       </div>
+ {showPremiumModal && (
+  <>
+    <div 
+      className="fixed inset-0 bg-black/50 z-[998]"
+      onClick={() => setShowPremiumModal(false)}
+    />
+    <div className="fixed inset-0 flex items-center justify-center z-[999] p-4">
+      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 relative">
+        <button
+          onClick={() => setShowPremiumModal(false)}
+          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <div className="flex flex-col items-center text-center">
+      <div className="w-full bg-[#F98180] text-white font-semibold text-sm py-2 rounded-md mb-4 mt-2 flex items-center justify-center gap-2">
+  <div className="w-5 h-5">
+    <AlertTriangle className="w-5 h-5" />
+  </div>
+  Access Restricted
+</div>
+
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            Premium Plan Required
+          </h3>
+          <p className="text-gray-600 text-sm mb-6">
+            This feature is exclusive to premium subscribers. Upgrade your plan to access this functionality and more advanced tools.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </>
+)}
+
+
     </nav>
+    
   );
 };
 

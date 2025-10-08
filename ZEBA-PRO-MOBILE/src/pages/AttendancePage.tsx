@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { IonDatetime, IonItem } from '@ionic/react';
+import { IonDatetime, IonItem, IonPopover } from '@ionic/react';
 import {
   Card,
   CardContent,
@@ -18,7 +18,10 @@ import {
   Calendar as CalendarIcon,
   Filter,
 } from 'lucide-react';
+  
 import axios from 'axios';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface ApiResponse<T> {
   data: T;
@@ -87,6 +90,12 @@ const AttendancePage: React.FC = () => {
   const [showDateFilter, setShowDateFilter] = useState(false);
   const startDateRef = useRef<HTMLDivElement>(null);
   const endDateRef = useRef<HTMLDivElement>(null);
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+ const filterRef = useRef<HTMLDivElement>(null);
+ const [showStartPicker, setShowStartPicker] = useState(false);
+const [showEndPicker, setShowEndPicker] = useState(false);
+const startRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
@@ -185,6 +194,28 @@ const AttendancePage: React.FC = () => {
     setEndDate(lastDay);
   }, []);
 
+    useEffect(() => {
+    const handleClickOutside = (event: Event) => {
+      if (
+        startRef.current &&
+        !startRef.current.contains(event.target as Node) &&
+        endRef.current &&
+        !endRef.current.contains(event.target as Node)
+      ) {
+        setShowStartPicker(false);
+        setShowEndPicker(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
   const goToPreviousWeek = () => {
     const newStartDate = new Date(startDate);
     newStartDate.setDate(newStartDate.getDate() - 7);
@@ -216,7 +247,7 @@ const AttendancePage: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.get<ApiResponse<AttendanceRecord[]>>('https://app.zeba.pro/backend/api/Attendances', {
+      const response = await axios.get<ApiResponse<AttendanceRecord[]>>(`${apiUrl}/Attendances`, {
         params: {
           startDate: apiStartDate,
           endDate: apiEndDate,
@@ -291,81 +322,82 @@ const AttendancePage: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
-          <HomeHeader />
-          <main className="max-w-6xl mx-auto px-4 pb-20 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-              <div>
-                <h1 className="text-2xl font-medium text-gray-900">My Attendance</h1>
-              </div>
-              <div className="flex items-center gap-0 mt-4 md:mt-0">
-                <button
-                  onClick={() => setShowDateFilter(!showDateFilter)}
-                  className={`flex items-center gap-2 !bg-white rounded-lg border-0 pl-4 transition-colors duration-200 ${
-                    showDateFilter
-                      ? 'bg-white border-blue-200 text-blue-700 font-bold'
-                      : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <Filter size={18} />
-                  <span className="text-sm font-medium"></span>
-                </button>
-                <div className="text-sm text-gray-600">
-                  {formatDisplayDate(startDate)} — {formatDisplayDate(endDate)}
-                </div>
-              </div>
-            </div>
 
-            {showDateFilter && (
-              <Card className="border border-gray-200 mb-8 overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="flex flex-col sm:flex-row items-stretch">
-                    <div className="bg-gray-200 text-black py-2 px-2 flex items-center justify-center sm:justify-start sm:w-64">
-                      <CalendarDays size={24} className="mr-3" />
-                      <div className="flex items-center justify-between gap-28">
-                        <h3 className="font-medium">Selected Period</h3>
-                        <p className="text-black text-sm">Custom Range</p>
-                      </div>
-                    </div>
-                    <div className="flex-1 flex items-center justify-center p-5 relative">
-                      <div className="hidden md:block text-gray-500 mr-4">Select start and end dates</div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={goToPreviousWeek}
-                          className="rounded-full p-1 text-gray-600 border border-gray-300 hover:bg-gray-100 transition-colors duration-200"
-                          aria-label="Previous week"
-                        >
-                          <ChevronLeft size={20} />
-                        </button>
-                        <IonItem>
-                          <IonDatetime
-                            presentation="date"
-                            value={startDate.toISOString()}
-                            onIonChange={(e) => setStartDate(new Date(e.detail.value as string))}
-                            max={endDate.toISOString()}
-                          />
-                        </IonItem>
-                        <span className="mx-2 text-gray-600">—</span>
-                        <IonItem>
-                          <IonDatetime
-                            presentation="date"
-                            value={endDate.toISOString()}
-                            onIonChange={(e) => setEndDate(new Date(e.detail.value as string))}
-                            min={startDate.toISOString()}
-                          />
-                        </IonItem>
-                        <button
-                          onClick={goToNextWeek}
-                          className="rounded-full p-1 text-gray-600 border border-gray-300 hover:bg-gray-100 transition-colors duration-200"
-                          aria-label="Next week"
-                        >
-                          <ChevronRight size={20} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          <main className="max-w-6xl mx-auto px-4 pb-20 pt-4">
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h1 className="text-2xl font-medium text-gray-900">My Attendance</h1>
+      </div>
+<div className="flex items-center gap-3 mt-4 md:mt-0">
+        <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg p-3 shadow-sm relative">
+          <CalendarIcon className="w-4 h-4 text-gray-500" />
+
+          {/* Start Date */}
+          <div ref={startRef} className="relative">
+            <button
+              onClick={() => {
+                setShowStartPicker((prev) => !prev);
+                setShowEndPicker(false);
+              }}
+              className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              {formatDisplayDate(startDate)}
+            </button>
+            {showStartPicker && (
+              <div className="absolute z-50 mt-2">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date: Date | null) => {
+                    if (date) {
+                      setStartDate(date);
+                      setShowStartPicker(false);
+                    }
+                  }}
+                  maxDate={endDate}
+                  inline
+                  className="bg-white text-black rounded-lg"
+                />
+              </div>
             )}
+          </div>
+
+          <span className="text-gray-500">-</span>
+
+          {/* End Date */}
+          <div ref={endRef} className="relative">
+            <button
+              onClick={() => {
+                setShowEndPicker((prev) => !prev);
+                setShowStartPicker(false);
+              }}
+              className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              {formatDisplayDate(endDate)}
+            </button>
+            {showEndPicker && (
+              <div className="absolute z-50 mt-2">
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date: Date | null) => {
+                    if (date) {
+                      setEndDate(date);
+                      setShowEndPicker(false);
+                    }
+                  }}
+                  minDate={startDate}
+                  inline
+                  className="bg-white text-black rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    
+    
+    </div>
+
+         
 
             <Card className="border border-gray-200 mb-8">
               <CardContent className="p-4 md:p-6">

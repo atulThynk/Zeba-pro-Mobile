@@ -199,7 +199,7 @@ const ProfilePage: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
-          <HomeHeader />
+         
           <main className="max-w-5xl mx-auto px-4 pb-20 pt-8">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>

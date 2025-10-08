@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { useEffect, useState, useRef  } from 'react';
+import { IonApp, IonHeader, IonPage, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
@@ -46,6 +46,7 @@ import './theme/variables.css';
 import './index.css';
 import { notificationService } from './services/notification-service';
 import TenantListPage from './components/TenantListPage';
+import HomeHeader from './components/HomeHeader';
 
 // Initialize Ionic React with proper config
 setupIonicReact({
@@ -121,17 +122,35 @@ const AppContent: React.FC = () => {
           document.documentElement.style.setProperty('--safe-area-inset-right', `${safeAreaInsets.insets.right}px`);
 
           // Configure status bar
-          await StatusBar.setStyle({ style: Style.Dark });
-          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+          await StatusBar.setStyle({ style: Style.Light });
+          await StatusBar.setBackgroundColor({ color: '#f8fafc' });
           await StatusBar.setOverlaysWebView({ overlay: false });
+            const statusBarHeight = safeAreaInsets.insets.top;
+      const existingOverlay = document.getElementById('status-bar-overlay');
+      if (!existingOverlay && statusBarHeight > 0) {
+        const statusBarOverlay = document.createElement('div');
+        statusBarOverlay.id = 'status-bar-overlay';
+        statusBarOverlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: ${statusBarHeight}px;
+          background-color: #ffff;
+          z-index: 99999;
+          pointer-events: none;
+        `;
+        document.body.appendChild(statusBarOverlay);
+      }
         } catch (error) {
           console.warn('Error configuring native plugins:', error);
           // Fallback to CSS env() variables
-          document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top, 20px)');
+          document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top, 10px)');
           document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom, 20px)');
           document.documentElement.style.setProperty('--safe-area-inset-left', 'env(safe-area-inset-left, 0px)');
           document.documentElement.style.setProperty('--safe-area-inset-right', 'env(safe-area-inset-right, 0px)');
         }
+        
       } else {
         // Web fallback
         document.documentElement.style.setProperty('--safe-area-inset-top', '0px');
@@ -139,6 +158,7 @@ const AppContent: React.FC = () => {
         document.documentElement.style.setProperty('--safe-area-inset-left', '0px');
         document.documentElement.style.setProperty('--safe-area-inset-right', '0px');
       }
+      
 
       // Set viewport height for mobile browsers
       const setViewportHeight = () => {
@@ -217,7 +237,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="app-container flex flex-col h-screen">
+    <IonPage className="app-container flex flex-col h-screen">
       {showSplash ? (
         <SplashScreen onComplete={handleSplashComplete} />
       ) : (
@@ -246,6 +266,12 @@ const AppContent: React.FC = () => {
               },
             }}
           />
+         {user && !authLoading && (
+  <IonHeader className="mb-12">
+    <HomeHeader />
+  </IonHeader>
+)}
+        
           <div className="flex-1 overflow-y-auto">
             <IonRouterOutlet animation={fadeAnimation}>
               <Route exact path="/login" component={AnimatedLogin} />
@@ -319,7 +345,7 @@ const AppContent: React.FC = () => {
           {user && !authLoading && <TabNavigation unreadNotificationsCount={unreadNotificationsCount} />}
         </>
       )}
-    </div>
+    </IonPage>
   );
 };
 

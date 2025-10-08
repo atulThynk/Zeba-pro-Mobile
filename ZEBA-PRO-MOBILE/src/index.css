@@ -23,8 +23,10 @@
   flex-direction: column;
 }
 
+
 main {
   flex: 1;
+  margin-top: 56px;
   overflow-y: auto;
   background: #ffffff !important; /* Force white background for main content */
 }
@@ -38,6 +40,7 @@ body {
 
 /* Ensure content doesn't overlap with tab navigation */
 ion-content, .main-content {
+  padding-top: 12px;
   --padding-bottom: calc(60px + var(--safe-area-inset-bottom, 0px));
   padding-bottom: calc(60px + var(--safe-area-inset-bottom, 0px));
   --background: #ffffff !important; /* Force white background for ion-content */
@@ -111,4 +114,9 @@ nav {
 
 .animate-netflix-logo {
   animation: netflix-logo 1.2s ease-out forwards;
+}
+
+.ion-header {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }

@@ -21,12 +21,14 @@ const NotificationsPage: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+
 
   useEffect(() => {
     const fetchNotifications = async () => {
       const token = localStorage.getItem('auth_token');
       try {
-        const response = await fetch('https://app.zeba.pro/backend/api/notifications?pageNo=1', {
+        const response = await fetch(`${apiUrl}/notifications?pageNo=1`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -58,11 +60,11 @@ const NotificationsPage: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
-          <HomeHeader />
+          
+          <main className="max-w-5xl mx-auto pb-20 px-1 sm:px-6 lg:px-8">
           <div className="px-6 py-4">
             <h2 className="text-2xl font-medium text-gray-800">Notifications</h2>
           </div>
-          <main className="max-w-5xl mx-auto pb-20 px-1 sm:px-6 lg:px-8">
             <div className="bg-white">
               <div>
                 {loading && (

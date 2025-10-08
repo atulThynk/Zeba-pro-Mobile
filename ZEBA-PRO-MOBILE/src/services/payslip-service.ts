@@ -75,7 +75,8 @@ export const payslipService = {
   downloadPayslipPDF: async (month: string, year: string | number): Promise<Blob> => {
     try {
       const url = `/Payroll/payslip/download?month=${month}&year=${year}&userId=1`;
-      const response = await fetch(`https://app.zeba.pro/backend/api${url}`, {
+      const apiUrl = import.meta.env.VITE_BASE_URL;
+      const response = await fetch(`${apiUrl}/${url}`, { 
         method: 'GET',
         headers: {
           'Accept': 'application/pdf',

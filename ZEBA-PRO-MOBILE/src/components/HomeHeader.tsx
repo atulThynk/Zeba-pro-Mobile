@@ -277,13 +277,21 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
       >
         <header className="flex justify-between items-center px-4 py-3 bg-white">
           <div className="flex items-center">
-            <Avatar
-              className="h-10 w-10 mr-3 cursor-pointer transition-transform active:scale-95"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <AvatarImage src={fetchedUser?.imageUrl || user?.imageUrl} alt={user?.name} />
-              <AvatarFallback>{user ? getInitials(user.name) : 'U'}</AvatarFallback>
-            </Avatar>
+<Avatar
+  className="h-10 w-10 mr-3 cursor-pointer transition-transform active:scale-95"
+  onClick={() => setIsModalOpen(true)}
+>
+  {((fetchedUser?.imageUrl && fetchedUser.imageUrl.trim() !== '') || 
+    (user?.imageUrl && user.imageUrl.trim() !== '')) && (
+    <AvatarImage 
+      src={fetchedUser?.imageUrl || user?.imageUrl} 
+      alt={user?.name}
+    />
+  )}
+  <AvatarFallback className="bg-blue-500 text-white font-semibold">
+    {user?.name ? getInitials(user.name) : userData?.firstName ? getInitials(`${userData.firstName} ${userData.lastName || ''}`) : 'U'}
+  </AvatarFallback>
+</Avatar>
           </div>
 
           <div className="flex items-center relative">
@@ -536,11 +544,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
                         } ${!isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
                         aria-label={`Switch to ${tenant.name}`}
                       >
-                        {isLoading && (
-                          <div className="mr-3">
-                            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                          </div>
-                        )}
+                        
                         <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mr-4 ${
                             isCurrent ? 'bg-blue-200 text-black' : 'bg-gray-200 text-gray-700'
@@ -563,6 +567,11 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
                             )}
                           </div>
                         </div>
+                        {isLoading && (
+                          <div className="mr-3">
+                            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        )}
                       </motion.button>
                     );
                   })}

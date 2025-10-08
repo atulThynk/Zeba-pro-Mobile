@@ -153,23 +153,34 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
   };
 
   // Calculate current session time
-  const getCurrentSessionTime = (): string => {
-    if (!attendance?.timeLogs || attendance.timeLogs.length === 0) {
-      return "00:00:00";
-    }
+const getCurrentSessionTime = (): string => {
+  if (!attendance?.timeLogs || attendance.timeLogs.length === 0) {
+    return "00:00:00";
+  }
 
-    const lastTimeLog = attendance.timeLogs[attendance.timeLogs.length - 1];
-    if (lastTimeLog.endTime) {
-      return "00:00:00";
-    }
+  const lastTimeLog = attendance.timeLogs[attendance.timeLogs.length - 1];
+  if (lastTimeLog.endTime) {
+    return "00:00:00";
+  }
 
-    const startTime = new Date(`${attendance.date}T${lastTimeLog.startTime}`);
-    const diffMs = currentTime.getTime() - startTime.getTime();
-    const hours = Math.floor(diffMs / (1000 * 60 * 60)).toString().padStart(2, '0');
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000).toString().padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
-  };
+  // Parse time safely
+  const [hours, minutes, seconds] = lastTimeLog.startTime.split(':').map(Number);
+
+  // Create start time using attendance.date (assumed format: YYYY-MM-DD)
+  const startTime = new Date(attendance.date);
+  startTime.setHours(hours, minutes, seconds, 0);
+
+  const diffMs = currentTime.getTime() - startTime.getTime();
+
+  if (diffMs < 0) return "00:00:00"; // just in case future time causes negative diff
+
+  const h = Math.floor(diffMs / (1000 * 60 * 60)).toString().padStart(2, '0');
+  const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+  const s = Math.floor((diffMs % (1000 * 60)) / 1000).toString().padStart(2, '0');
+
+  return `${h}:${m}:${s}`;
+};
+  
 
   const isCheckedIn = getCurrentSessionTime() !== "00:00:00";
 

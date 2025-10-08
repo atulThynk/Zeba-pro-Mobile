@@ -118,9 +118,9 @@ useEffect(() => {
     <IonPage>
       <IonContent fullscreen>
         <div className="bg-white text-foreground min-h-screen">
-          <HomeHeader onProfileClick={handleProfileClick} />
           
-          <main className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]">
+          
+          <main className="p-4 pt-[calc(var(--safe-area-inset-top)+1rem)]]">
             <div className="mb-6">
               <h1 className="text-2xl text-black font-bold">Hello, {userData?.firstName || 'User'}</h1>
             </div>

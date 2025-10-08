@@ -136,11 +136,7 @@ const TenantListPage: React.FC = () => {
                       isCurrent ? 'border-l-4 border-blue-500' : 'hover:bg-gray-50'
                     } ${!isActive ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {isLoading && (
-                      <div className="mr-3">
-                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    )}
+                    
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mr-3 ${
                         isCurrent ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
@@ -153,6 +149,11 @@ const TenantListPage: React.FC = () => {
                       {!isActive && <div className="text-xs text-gray-400">Inactive</div>}
                       {isCurrent && !isLoading && <div className="text-xs text-blue-600">Current</div>}
                     </div>
+                    {isLoading && (
+                      <div className="mr-3">
+                        <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
                   </motion.button>
                 );
               })}

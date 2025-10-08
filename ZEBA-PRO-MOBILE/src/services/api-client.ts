@@ -1,6 +1,10 @@
+console.log('VITE_BASE_URL:', import.meta.env.VITE_BASE_URL);
+
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const BASE_URL = 'https://app.zeba.pro/backend/api';
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+console.log('BASE_URL:', BASE_URL);
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
