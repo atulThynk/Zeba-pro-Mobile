@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wine } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { WorkAnniversary } from '@/services/dashboard-service';
+import { Dot } from 'recharts';
+import DotAnimation from '../DotAnimation';
 
 interface AnniversariesCardProps {
   anniversaries: WorkAnniversary[];
@@ -43,7 +45,7 @@ const AnniversariesCard: React.FC<AnniversariesCardProps> = ({ anniversaries, is
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600  text-sm">Loading anniversaries...</p>
+            <DotAnimation/>
           </div>
         </CardContent>
       </Card>

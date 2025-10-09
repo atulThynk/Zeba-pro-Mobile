@@ -19,9 +19,10 @@ interface User {
 
 interface HomeHeaderProps {
   onProfileClick?: () => void;
+  onModalStateChange?: (isOpen: boolean) => void;
 }
 
-const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
+const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick , onModalStateChange}) => {
   const { user, logout } = useAuth();
   const router = useIonRouter();
   const { toast } = useToast();
@@ -38,6 +39,16 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
   const tenantName = localStorage.getItem('tenantName');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const userData =JSON.parse(localStorage.getItem('user') || '{}');
+  const [tenantLogoError, setTenantLogoError] = useState(false);
+
+
+useEffect(() => {
+    const anyModalOpen = isModalOpen || isTenantModalOpen;
+    if (onModalStateChange) {
+      onModalStateChange(anyModalOpen);
+    }
+  }, [isModalOpen, isTenantModalOpen, onModalStateChange]);
+
   useEffect(() => {
     const fetchUserData = async (retryCount = 0, maxRetries = 2) => {
       if (!user) {
@@ -127,6 +138,26 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
       searchInputRef.current.focus();
     }
   }, [isTenantModalOpen]);
+
+  useEffect(() => {
+  const handleBackButton = (ev: any) => {
+    ev.detail.register(10, () => {
+      if (isModalOpen) {
+        setIsModalOpen(false);
+      } else if (isTenantModalOpen) {
+        setIsTenantModalOpen(false);
+      } else {
+        router.goBack();
+      }
+    });
+  };
+
+  document.addEventListener('ionBackButton', handleBackButton);
+  return () => {
+    document.removeEventListener('ionBackButton', handleBackButton);
+  };
+}, [isModalOpen, isTenantModalOpen, router]);
+
 
   const getTenantInitials = (tenantName: string) => {
     if (!tenantName) return '??';
@@ -360,11 +391,19 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
                     transition={{ delay: 0.2, duration: 0.3 }}
                   >
                     <Avatar className="h-20 w-20 mb-4 ring-4 ring-gray-100 shadow-sm">
-                      <AvatarImage src={fetchedUser?.imageUrl || user?.imageUrl} alt={user?.name} />
-                      <AvatarFallback className="text-2xl text-black">
-                        {user ? getInitials(user.name) : 'U'}
-                      </AvatarFallback>
-                    </Avatar>
+  {(fetchedUser?.imageUrl && fetchedUser.imageUrl.trim() !== '') ||
+  (user?.imageUrl && user.imageUrl.trim() !== '') ? (
+    <AvatarImage src={fetchedUser?.imageUrl || user?.imageUrl} alt={user?.name} />
+  ) : null}
+  <AvatarFallback className="text-2xl text-black bg-blue-100">
+    {user?.name
+      ? getInitials(user.name)
+      : userData?.firstName
+      ? getInitials(`${userData.firstName} ${userData.lastName || ''}`)
+      : 'U'}
+  </AvatarFallback>
+</Avatar>
+
                   </motion.div>
                   <motion.h3
                     initial={{ y: 10, opacity: 0 }}
@@ -473,7 +512,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick }) => {
       <AnimatePresence>
         {isTenantModalOpen && (
           <motion.div
-            initial={{ y: '100%' }}
+            
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}

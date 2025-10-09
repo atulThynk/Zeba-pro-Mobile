@@ -4,6 +4,8 @@ import { Birthday } from '@/services/dashboard-service';
 import { Cake, CakeSlice } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDate, getInitials } from '@/lib/utils';
+import { Dot } from 'recharts';
+import DotAnimation from '../DotAnimation';
 
 interface BirthdaysCardProps {
   birthdays: Birthday[];
@@ -29,7 +31,7 @@ const BirthdaysCard: React.FC<BirthdaysCardProps> = ({ birthdays, isLoading }) =
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600  text-sm">Loading birthdays...</p>
+            <DotAnimation/>
           </div>
         </CardContent>
       </Card>

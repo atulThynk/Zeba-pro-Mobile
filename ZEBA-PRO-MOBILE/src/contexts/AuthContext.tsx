@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await authService.logout();
       setUser(null);
       await pushNotificationService.unregisterDevice(); // Unregister device on logout
-      toast.success("You have been successfully logged out.");
+     
       localStorage.clear(); // Clear local storage
     } catch (error) {
       console.error('Logout failed:', error);

@@ -80,7 +80,7 @@ const AppContent: React.FC = () => {
   const { isInitialized, error } = usePushNotifications();
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
-
+ const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     // Check if app has launched before
     const hasLaunchedBefore = localStorage.getItem('appLaunchedBefore');
@@ -266,9 +266,9 @@ const AppContent: React.FC = () => {
               },
             }}
           />
-         {user && !authLoading && (
+ {user && !authLoading && (
   <IonHeader className="mb-12">
-    <HomeHeader />
+    <HomeHeader onModalStateChange={setIsModalOpen} />
   </IonHeader>
 )}
         
@@ -329,7 +329,7 @@ const AppContent: React.FC = () => {
                   </ProtectedRoute>
                 )}
               />
-              <Route
+              {/* <Route
                 exact
                 path="/tenants"
                 render={() => (
@@ -337,12 +337,20 @@ const AppContent: React.FC = () => {
                     <TenantListPage />
                   </ProtectedRoute>
                 )}
-              />
+              /> */}
               <Route exact path="/index.html" render={() => <Redirect to="/" />} />
               <Route component={NotFound} />
             </IonRouterOutlet>
           </div>
-          {user && !authLoading && <TabNavigation unreadNotificationsCount={unreadNotificationsCount} />}
+          {user && !authLoading && (
+  <div
+    className={`transition-all duration-300 ${
+      isModalOpen ? 'opacity-0 pointer-events-none translate-y-full' : 'opacity-100 translate-y-0'
+    }`}
+  >
+    <TabNavigation unreadNotificationsCount={unreadNotificationsCount} />
+  </div>
+)}
         </>
       )}
     </IonPage>

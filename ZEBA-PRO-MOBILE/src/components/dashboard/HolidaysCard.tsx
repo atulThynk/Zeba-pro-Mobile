@@ -4,6 +4,7 @@ import { Holiday } from '@/services/dashboard-service';
 import { Calendar, Lock, PartyPopper } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import * as LucideIcons from 'lucide-react';
+import DotAnimation from '../DotAnimation';
 
 interface HolidaysCardProps {
   holidays: Holiday[];
@@ -26,13 +27,13 @@ const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, isLoading }) => {
       <Card className="border border-[#e4e7eb] bg-white  mb-6">
         <CardHeader className="px-4 py-3 border-b border-gray-200 ">
           <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 ">
-            <div>Upcoming Holidays</div>
+            <div>Holidays</div>
             <div className="text-xs text-gray-500 ">This Month</div>
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600 text-sm">Loading holidays...</p>
+          <DotAnimation/>
           </div>
         </CardContent>
       </Card>
@@ -43,7 +44,7 @@ const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays, isLoading }) => {
     <Card className="border border-[#e4e7eb] bg-white  mb-6 relative">
       <CardHeader className="px-4 py-3 border-b border-gray-200 ">
         <CardTitle className="text-sm font-semibold flex justify-between items-center text-gray-900 ">
-          <div>Upcoming Holidays</div>
+          <div> Holidays</div>
           <div className="text-xs text-gray-500 ">This Month</div>
         </CardTitle>
       </CardHeader>

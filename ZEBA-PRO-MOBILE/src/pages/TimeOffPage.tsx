@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Button } from '../components/ui/button';
 import { Dialog } from '../components/ui/dialog';
 import ApplyLeaveModal from '../components/modal/ApplyLeaveModal';
+import DotAnimation from '@/components/DotAnimation';
 
 const TimeOffPage: React.FC = () => {
   const { user } = useAuth();
@@ -187,8 +188,8 @@ const TimeOffPage: React.FC = () => {
                 <h2 className="text-lg font-semibold text-gray-800 mb-3">Upcoming Leaves</h2>
                 {isLoadingUpcoming ? (
                   <div className="animate-pulse space-y-3">
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="h-12 bg-gray-100 rounded"></div>
+                    {Array.from({ length: 1 }).map((_, index) => (
+                    <DotAnimation/>
                     ))}
                   </div>
                 ) : upcomingLeaves && upcomingLeaves.data && upcomingLeaves.data.length > 0 ? (
@@ -228,11 +229,7 @@ const TimeOffPage: React.FC = () => {
               <div>
                 <h2 className="text-lg font-semibold text-gray-800 mb-3">Past Leaves</h2>
                 {isLoadingPast ? (
-                  <div className="animate-pulse space-y-3">
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="h-12 bg-gray-100 rounded"></div>
-                    ))}
-                  </div>
+                  <DotAnimation/>
                 ) : pastLeaves && pastLeaves.data && pastLeaves.data.length > 0 ? (
                   <Table>
                     <TableHeader>

@@ -22,6 +22,7 @@ import {
 import axios from 'axios';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DotAnimation from '@/components/DotAnimation';
 
 interface ApiResponse<T> {
   data: T;
@@ -323,7 +324,7 @@ const startRef = useRef<HTMLDivElement>(null);
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
 
-          <main className="max-w-6xl mx-auto px-4 pb-20 pt-4">
+          <main className="max-w-6xl mx-auto px-4 pb-32 pt-4">
          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div>
         <h1 className="text-2xl font-medium text-gray-900">My Attendance</h1>
@@ -521,8 +522,9 @@ const startRef = useRef<HTMLDivElement>(null);
               {isLoading ? (
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Skeleton key={index} className="h-16 w-full" />
+                    {Array.from({ length: 1 }).map((_, index) => (
+                      
+                      <DotAnimation/>
                     ))}
                   </div>
                 </CardContent>

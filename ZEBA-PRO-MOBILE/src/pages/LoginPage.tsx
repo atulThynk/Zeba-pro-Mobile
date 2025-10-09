@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import logoImage from '../public/assets/zebaDark.png';
 import { toast } from '@/hooks/use-toast';
+import LoadingSmiley from '@/components/Loader'
 
 const LoginPage = () => {
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -113,6 +114,23 @@ const LoginPage = () => {
       return () => clearTimeout(timer);
     }
   }, [showEmailForm]);
+  React.useEffect(() => {
+  const handlePopState = (event:any) => {
+    if (showEmailForm) {
+      event.preventDefault();
+      goBack();
+      window.history.pushState(null, "", window.location.href);
+    }
+  };
+  if (showEmailForm) {
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
+  }
+
+  return () => {
+    window.removeEventListener("popstate", handlePopState);
+  };
+}, [showEmailForm]);
 
   return (
     <div

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
 import HomeHeader from '@/components/HomeHeader';
+import DotAnimation from '@/components/DotAnimation';
 
 // Define the notification type based on API response
 interface Notification {
@@ -69,7 +70,7 @@ const NotificationsPage: React.FC = () => {
               <div>
                 {loading && (
                   <div className="p-6 text-center text-gray-500">
-                    <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+                   <DotAnimation/>
                     <p className="mt-2">Loading notifications...</p>
                   </div>
                 )}

@@ -14,6 +14,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 import { AxiosError } from 'axios';
+import DotAnimation from '@/components/DotAnimation';
 
 // Helper function to get last month's date
 const getLastMonthDate = () => {
@@ -167,7 +168,7 @@ const PayslipPage: React.FC = () => {
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white text-gray-800">
          
-          <main className="p-4 max-w-4xl mx-auto pb-20">
+          <main className="p-4 max-w-4xl mx-auto pb-32">
             <div className="mb-6">
               <h1 className="text-2xl font-medium text-black">Payslips</h1>
               <p className="text-gray-500">Access and download your monthly payslips</p>
@@ -241,11 +242,7 @@ const PayslipPage: React.FC = () => {
 
             {isLoading || isFetching ? (
               <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col items-center justify-center py-8">
-                <div className="animate-pulse flex flex-col items-center gap-4 w-full">
-                  <div className="h-6 bg-gray-100 w-1/3 rounded"></div>
-                  <div className="h-40 bg-gray-100 w-full rounded"></div>
-                  <div className="h-6 bg-gray-100 w-2/3 rounded"></div>
-                </div>
+               <DotAnimation/>
                 <p className="text-sm text-gray-500 mt-4">Loading payslip for {format(date, "MMMM yyyy")}...</p>
               </div>
             ) : error ? (

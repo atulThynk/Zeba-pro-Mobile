@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Announcement as AnnouncementType } from '@/services/dashboard-service';
 import { Calendar, Lock, LockIcon, LockKeyhole, MicVocal } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import DotAnimation from '../DotAnimation';
 
 interface AnnouncementsCardProps {
   announcements: AnnouncementType[];
@@ -31,7 +32,7 @@ const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({ announcements, is
         </CardHeader>
         <CardContent className="p-4">
           <div className="h-[100px] flex items-center justify-center">
-            <p className="text-gray-600  text-sm">Loading announcements...</p>
+            <DotAnimation/>
           </div>
         </CardContent>
       </Card>
