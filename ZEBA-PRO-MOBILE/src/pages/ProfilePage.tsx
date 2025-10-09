@@ -150,9 +150,9 @@ const ProfilePage: React.FC = () => {
   // Helper to map gender code to text
   const getGenderText = (gender: number | null | undefined): string => {
     const genderMap: { [key: number]: string } = {
-      0: 'Male',
-      1: 'Female',
-      2: 'Other',
+      1: 'Male',
+      2: 'Female',
+    
     };
     return gender !== undefined && gender !== null ? genderMap[gender] || 'Unknown' : 'Unknown';
   };

@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover
 import { toast } from '@/hooks/use-toast';
 import { AxiosError } from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIonRouter } from '@ionic/react';
 
 interface LeaveFormData {
   leaveTypeId: string;
@@ -42,6 +43,7 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
   const [activeInput, setActiveInput] = useState<HTMLElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const router = useIonRouter();
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<LeaveFormData>({
     defaultValues: {
@@ -150,7 +152,7 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
         inline: 'nearest',
       });
     }, 100);
-  };
+  }; 
 
   const handleInputBlur = () => {
     setActiveInput(null);
@@ -220,6 +222,25 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
     setShowUserDropdown(false);
     setActiveInput(null);
   };
+    useEffect(() => {
+    const handleBackButton = (ev: any) => {
+      ev.detail.register(10, () => {
+        if (isOpen) {
+         
+          handleClose();
+        } else {
+          
+          router.goBack();
+        }
+      });
+    };
+
+    document.addEventListener('ionBackButton', handleBackButton);
+
+    return () => {
+      document.removeEventListener('ionBackButton', handleBackButton);
+    };
+  }, [isOpen, handleClose]);
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -481,7 +502,7 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
               </form>
 
               {/* Footer */}
-              <div className="px-4 py-4 mb-16 border-t border-gray-100 bg-white">
+              <div className="px-4 py-4 mb-8 border-t border-gray-100 bg-white">
                 <div className="flex gap-3">
                   <Button
                     type="button"

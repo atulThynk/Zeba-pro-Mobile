@@ -11,13 +11,43 @@ import { Button } from '../components/ui/button';
 import { Dialog } from '../components/ui/dialog';
 import ApplyLeaveModal from '../components/modal/ApplyLeaveModal';
 import DotAnimation from '@/components/DotAnimation';
+import { Capacitor } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
+const TimeOffPage: React.FC<{ onModalStateChange?: (isOpen: boolean) => void }> = ({ onModalStateChange }) => {
 
-const TimeOffPage: React.FC = () => {
   const { user } = useAuth();
   const [currentPage] = useState(1);
   const [isApplyLeaveOpen, setIsApplyLeaveOpen] = useState(false);
   const userId = user?.id;
   const queryClient = useQueryClient();
+useEffect(() => {
+  let backHandler: Awaited<ReturnType<typeof CapacitorApp.addListener>> | null = null;
+
+  const setupBackHandler = async () => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    backHandler = await CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (isApplyLeaveOpen) {
+        setIsApplyLeaveOpen(false);
+        onModalStateChange?.(false); 
+      } else if (!canGoBack) {
+        CapacitorApp.exitApp(); 
+      } else {
+        window.history.back();
+      }
+    });
+  };
+
+  setupBackHandler();
+
+  return () => {
+    // safely remove the listener if available
+    if (backHandler && typeof backHandler.remove === 'function') {
+      backHandler.remove();
+    }
+  };
+}, [isApplyLeaveOpen]);
+
 
   // Fetch leave balances
   const { data: leaveBalances, isLoading: isLoadingBalances } = useQuery({
@@ -116,6 +146,7 @@ const TimeOffPage: React.FC = () => {
 
   const handleApplyLeave = () => {
     setIsApplyLeaveOpen(true);
+    onModalStateChange?.(true); 
   };
 
   const handleCloseApplyLeave = () => {
@@ -266,11 +297,22 @@ const TimeOffPage: React.FC = () => {
             </div>
           </main>
 
-          <Dialog open={isApplyLeaveOpen} onOpenChange={setIsApplyLeaveOpen}>
+          <Dialog
+  open={isApplyLeaveOpen}
+  onOpenChange={(open) => {
+    setIsApplyLeaveOpen(open);
+    onModalStateChange?.(open); 
+    if (!open) handleCloseApplyLeave(); 
+  }}
+>
             <ApplyLeaveModal
               isOpen={isApplyLeaveOpen}
-              onClose={handleCloseApplyLeave}
-              leaveTypes={leaveTypes}
+              onClose={() => {
+      setIsApplyLeaveOpen(false);
+      onModalStateChange?.(false); 
+      handleCloseApplyLeave();
+    }}
+              leaveTypes={leaveTypes}              
               isLoadingLeaveTypes={isLoadingLeaveTypes}
             />
           </Dialog>

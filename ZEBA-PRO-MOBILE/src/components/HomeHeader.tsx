@@ -24,6 +24,8 @@ interface HomeHeaderProps {
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick , onModalStateChange}) => {
   const { user, logout } = useAuth();
+const [finalImageUrl, setFinalImageUrl] = useState<string>('');
+  
   const router = useIonRouter();
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +42,29 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick , onModalStateCh
   const searchInputRef = useRef<HTMLInputElement>(null);
   const userData =JSON.parse(localStorage.getItem('user') || '{}');
   const [tenantLogoError, setTenantLogoError] = useState(false);
+  const preloadImage = (src?: string) => {
+  if (!src) return;
+  const img = new Image();
+  img.src = src;
+};
+
+ useEffect(() => {
+
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const imageUrl =
+    fetchedUser?.imageUrl?.trim() ||
+    user?.imageUrl?.trim() ||
+    storedUser?.imageUrl?.trim() ||
+    '';
+
+  if (imageUrl) {
+    setFinalImageUrl(imageUrl);
+    const img = new Image();
+    img.src = imageUrl;
+  } else {
+    setFinalImageUrl('');
+  }
+}, [fetchedUser, user]);
 
 
 useEffect(() => {
@@ -169,7 +194,7 @@ useEffect(() => {
   const getCurrentTenantName = () => {
     
     if (!user?.id || !allTenants.length) return 'No Organization Selected';
-    const currentTenant = allTenants.find((tenant) => tenant.id === user.id);
+    const currentTenant = allTenants.find((tenant) => tenant.id === user?.currentTenantId);
     return currentTenant ? currentTenant.tenantName : 'Unknown Organization';
   };
 
@@ -312,16 +337,17 @@ useEffect(() => {
   className="h-10 w-10 mr-3 cursor-pointer transition-transform active:scale-95"
   onClick={() => setIsModalOpen(true)}
 >
-  {((fetchedUser?.imageUrl && fetchedUser.imageUrl.trim() !== '') || 
-    (user?.imageUrl && user.imageUrl.trim() !== '')) && (
-    <AvatarImage 
-      src={fetchedUser?.imageUrl || user?.imageUrl} 
-      alt={user?.name}
-    />
+  {finalImageUrl ? (
+    <AvatarImage src={finalImageUrl} alt={user?.name || 'User'} />
+  ) : (
+    <AvatarFallback className="bg-blue-500 text-white font-semibold">
+      {user?.name
+        ? getInitials(user.name)
+        : userData?.firstName
+        ? getInitials(`${userData.firstName} ${userData.lastName || ''}`)
+        : 'U'}
+    </AvatarFallback>
   )}
-  <AvatarFallback className="bg-blue-500 text-white font-semibold">
-    {user?.name ? getInitials(user.name) : userData?.firstName ? getInitials(`${userData.firstName} ${userData.lastName || ''}`) : 'U'}
-  </AvatarFallback>
 </Avatar>
           </div>
 
@@ -361,149 +387,78 @@ useEffect(() => {
       </div>
 
       {/* Profile Modal */}
-      <AnimatePresence>
+     <AnimatePresence>
         {isModalOpen && (
+            <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[999]"
+      onClick={() => setIsModalOpen(false)} 
+    >
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-[1000] bg-white rounded-t-2xl shadow-lg"
-            style={{ height: '92vh' }}
+            className="fixed top-0 left-0 bottom-0 z-[1000] bg-white shadow-2xl"
+            style={{ width: '85vw', maxWidth: '400px' }}
+             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col h-full">
-              <div className="flex flex-col items-center">
-                <div className="flex justify-end w-full px-4 pb-2">
+              {/* Profile Header */}
+              <div className="px-6 pt-16 pb-6">
+                <div className="flex items-center justify-between mb-6">
+                <Avatar className="h-16 w-16">
+  {finalImageUrl ? (
+    <AvatarImage src={finalImageUrl} alt={user?.name || 'User'} />
+  ) : (
+    <AvatarFallback className="text-xl text-black bg-blue-500">
+      {user?.name
+        ? getInitials(user.name)
+        : userData?.firstName
+        ? getInitials(`${userData.firstName} ${userData.lastName || ''}`)
+        : 'U'}
+    </AvatarFallback>
+  )}
+</Avatar>
+                
+                </div>
+                
+                <div>
+                  <h3 className="text-black font-bold text-xl mb-1">
+                    {userData?.firstName + " " + userData?.lastName || 'User'}
+                  </h3>
+                  <p className="text-gray-400 text-sm mb-1">
+                    {user?.email || 'user@example.com'}
+                  </p>
+                
+                </div>
+              </div>
+
+              {/* Menu Items */}
+              <div className="flex-1 overflow-auto">
+                <div className="px-2">
                   <button
-                    className="text-gray-800 font-medium text-base mt-6 px-3 py-1 rounded-full hover:bg-blue-50 transition-colors"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={handleProfileClick}
+                    className="flex items-center w-full py-4 px-4 text-black hover:bg-gray-800 rounded-lg transition-all"
                   >
-                    <X className="h-6 w-6" />
+                    <UserRound className="h-5 w-5 mr-4" />
+                    <span className="text-base">My Profile</span>
+                  </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full py-4 px-4 text-black hover:bg-gray-800 rounded-lg transition-all"
+                  >
+                    <LogOut className="h-5 w-5 mr-4 text-red-600" />
+                    <span className="text-base text-red-600">Logout</span>
                   </button>
                 </div>
               </div>
-
-              <div className="flex-1 overflow-auto">
-                <div className="flex flex-col items-center px-4 py-6">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
-                  >
-                    <Avatar className="h-20 w-20 mb-4 ring-4 ring-gray-100 shadow-sm">
-  {(fetchedUser?.imageUrl && fetchedUser.imageUrl.trim() !== '') ||
-  (user?.imageUrl && user.imageUrl.trim() !== '') ? (
-    <AvatarImage src={fetchedUser?.imageUrl || user?.imageUrl} alt={user?.name} />
-  ) : null}
-  <AvatarFallback className="text-2xl text-black bg-blue-100">
-    {user?.name
-      ? getInitials(user.name)
-      : userData?.firstName
-      ? getInitials(`${userData.firstName} ${userData.lastName || ''}`)
-      : 'U'}
-  </AvatarFallback>
-</Avatar>
-
-                  </motion.div>
-                  <motion.h3
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.3 }}
-                    className="text-black font-bold text-xl mb-1"
-                  >
-                    {userData?.firstName + " "  + userData?.lastName|| 'User'}
-                  </motion.h3>
-                  <motion.p
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4, duration: 0.3 }}
-                    className="text-gray-600 text-sm mb-6"
-                  >
-                    {user?.email || 'user@example.com'}
-                  </motion.p>
-                </div>
-
-                <div className="px-6 py-2">
-                  {/* {shouldShowOrganizations && (
-                    <>
-                      <motion.div
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.4, duration: 0.3 }}
-                        className="mb-4"
-                      >
-                        <div className="flex items-center justify-between w-full py-4 border-b border-gray-100">
-                          <div className="flex items-center">
-                            <div className="bg-blue-50 p-2 rounded-full mr-4">
-                              <Settings className="h-5 w-5 text-blue-600" />
-                            </div>
-                            <span className="text-black text-base font-medium">Current Organization</span>
-                          </div>
-                          <span className="text-sm text-gray-600">{getCurrentTenantName()}</span>
-                        </div>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.5, duration: 0.3 }}
-                      >
-                        <button
-                          onClick={() => {
-                            setIsModalOpen(false);
-                            openTenantModal();
-                          }}
-                          className="flex items-center justify-between w-full py-4 border-b border-gray-100 transition-all hover:bg-gray-50 rounded-lg px-3"
-                        >
-                          <div className="flex items-center">
-                            <div className="bg-blue-50 p-2 rounded-full mr-4">
-                              <Building2 className="h-5 w-5 text-blue-600" />
-                            </div>
-                            <span className="text-black text-base font-medium">Switch Organization</span>
-                          </div>
-                        </button>
-                      </motion.div>
-                    </>
-                  )} */}
-
-                  <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.6, duration: 0.3 }}
-                  >
-                    <button
-                      onClick={handleProfileClick}
-                      className="flex items-center justify-between w-full py-4 border-b border-gray-100 transition-all hover:bg-gray-50 rounded-lg px-3"
-                    >
-                      <div className="flex items-center">
-                        <div className="bg-blue-50 p-2 rounded-full mr-4">
-                          <UserRound className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <span className="text-black text-base font-medium">My Profile</span>
-                      </div>
-                    </button>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.7, duration: 0.3 }}
-                  >
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center justify-between w-full py-4 border-b border-gray-100 transition-all hover:bg-red-50 rounded-lg px-3 mt-2"
-                    >
-                      <div className="flex items-center">
-                        <div className="bg-red-50 p-2 rounded-full mr-4">
-                          <LogOut className="h-5 w-5 text-red-500" />
-                        </div>
-                        <span className="text-red-500 text-base font-medium">Logout</span>
-                      </div>
-                    </button>
-                  </motion.div>
-                </div>
-              </div>
             </div>
+          </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -565,6 +520,7 @@ useEffect(() => {
                   )}
                   {sortedTenants.map((tenant) => {
                     const isCurrent = user?.currentTenantId === tenant.id;
+                    console.log('C',isCurrent,'A',user?.currentTenantId,'B',tenant.id,'E',user)
                     const isActive = tenant.isActive;
                     const isLoading = tenantLoadingId === tenant.id && loading;
 

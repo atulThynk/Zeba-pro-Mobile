@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useIonRouter } from '@ionic/react';
 import { Calendar, LayoutDashboard, Clock, FileText, Bell, X, ShieldAlert,AlertTriangle } from 'lucide-react';
 import { LockedFeatureIcon } from './icons/RestrictedAccessIcon';
+import { createPortal } from 'react-dom';
 
 interface TabNavigationProps {
   unreadNotificationsCount?: number;
@@ -137,6 +138,7 @@ const RestrictedTab = ({ icon, label, isActiveTab }: { icon: React.ReactNode; la
         </div>
       </div>
  {showPremiumModal && (
+  createPortal(
   <>
     <div 
       className="fixed inset-0 bg-black/50 z-[998]"
@@ -168,7 +170,9 @@ const RestrictedTab = ({ icon, label, isActiveTab }: { icon: React.ReactNode; la
 
       </div>
     </div>
-  </>
+  </>,
+   document.body
+  )
 )}
 
 

@@ -10,8 +10,8 @@ const config: CapacitorConfig = {
       customColorsForSystemBars: true,
       statusBarColor: '#ffffff', // White
       statusBarContent: 'light', 
-      navigationBarColor: '#ffffff', // White (Android)
-      navigationBarContent: 'light',
+      navigationBarColor: '#f2f2f2', // White (Android)
+      navigationBarContent: 'dark',
       offset: 0
     },
     StatusBar: {

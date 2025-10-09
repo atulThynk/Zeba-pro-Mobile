@@ -77,7 +77,7 @@ ion-page > ion-content {
 }
 
 nav {
-  --ion-background-color: #ffffff;
+  --ion-background-color: black;
   --ion-border-color: #e4e7eb;
   padding-bottom: var(--safe-area-inset-bottom, 0px);
 }

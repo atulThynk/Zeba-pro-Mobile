@@ -142,6 +142,7 @@ const AppContent: React.FC = () => {
         `;
         document.body.appendChild(statusBarOverlay);
       }
+      
         } catch (error) {
           console.warn('Error configuring native plugins:', error);
           // Fallback to CSS env() variables
@@ -266,9 +267,9 @@ const AppContent: React.FC = () => {
               },
             }}
           />
- {user && !authLoading && (
-  <IonHeader className="mb-12">
-    <HomeHeader onModalStateChange={setIsModalOpen} />
+ {user && !authLoading && !isModalOpen && (
+  <IonHeader className="mb-12 transition-all duration-300">
+    <HomeHeader />
   </IonHeader>
 )}
         
@@ -298,7 +299,7 @@ const AppContent: React.FC = () => {
                 path="/timeoff"
                 render={() => (
                   <ProtectedRoute>
-                    <TimeOffPage />
+                     <TimeOffPage onModalStateChange={setIsModalOpen} />
                   </ProtectedRoute>
                 )}
               />

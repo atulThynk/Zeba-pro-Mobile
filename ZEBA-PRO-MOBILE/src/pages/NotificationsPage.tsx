@@ -5,6 +5,7 @@ import DotAnimation from '@/components/DotAnimation';
 
 // Define the notification type based on API response
 interface Notification {
+  imageURL: string | undefined;
   id: number;
   fromUserId: number;
   actorName: string;
@@ -102,11 +103,11 @@ const NotificationsPage: React.FC = () => {
                       >
                         <div className="flex-shrink-0 mr-4">
                           <img
-                            src={notification.imageBytes 
-                              ? `data:image/jpeg;base64,${notification.imageBytes}` 
+                            src={notification.imageURL
+                              ? `${notification.imageURL}` 
                               : "https://png.pngtree.com/png-vector/20250117/ourlarge/pngtree-friendly-and-professional-male-avatar-in-a-blue-suit-red-tie-png-image_15236012.png"}
                             alt={`${notification.actorName}`}
-                            className="h-10 w-10 rounded-full"
+                            className="h-10 w-10 rounded-full "
                           />
                         </div>
                         
