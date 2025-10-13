@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import toast from 'react-hot-toast'; // Import react-hot-toast
 import { authService, User } from '@/services/auth-service';
 import { pushNotificationService } from '@/services/pushNotificationService';
+import { useIonRouter } from '@ionic/react';
+import LoadingSmiley from '@/components/Loader';
 
 interface AuthContextType {
   user: User | null;
@@ -16,15 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-    const preloadUserImage = (url?: string): Promise<void> => {
-    return new Promise((resolve) => {
-      if (!url || url.trim() === '') return resolve();
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
-      img.src = url;
-    });
-  };
+  const router = useIonRouter();
 
   useEffect(() => {
     // Check if the user is already logged in
@@ -32,8 +26,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         if (authService.isAuthenticated()) {
           const currentUser = await authService.getCurrentUser();
-          localStorage.setItem('user', JSON.stringify(currentUser));
-           await preloadUserImage(currentUser?.imageUrl);
           setUser(currentUser);
         }
       } catch (error) {
@@ -48,31 +40,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkAuthentication();
   }, []);
 
- const login = async (email: string, password: string) => {
-  try {
-    setIsLoading(true);
-    const response = await authService.login({ email, password });
-    if (response.token) {
-      localStorage.setItem('auth_token', response.token);
+  const login = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      const response = await authService.login({ email, password });
+      setUser(response.user);
+      toast.success(`Welcome back, ${response.user.name}!`);
+      return Promise.resolve();
+    } catch (error) {
+      console.error('Login failed:', error);
+      toast.error("Invalid email or password. Please try again.");
+      return Promise.reject(error);
+    } finally {
+      setIsLoading(false);
     }
-    const fullUser = await authService.getCurrentUser();
-    await preloadUserImage(fullUser?.imageUrl);
-    
-   
-    localStorage.setItem('user', JSON.stringify(fullUser));
-     setUser(fullUser);
-   await preloadUserImage(fullUser?.imageUrl);
-    toast.success(`Welcome back, ${fullUser.name || 'User'}!`);
-    return Promise.resolve();
-  } catch (error) {
-    console.error('Login failed:', error);
-    toast.error("Invalid email or password. Please try again.");
-    return Promise.reject(error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const logout = async () => {
     try {
@@ -84,8 +66,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.clear(); // Clear local storage
     } catch (error) {
       console.error('Logout failed:', error);
-      // Force logout on client side even if API fails
-      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +78,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     logout,
     isAuthenticated: !!user,
   };
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center"><LoadingSmiley/></div>;
+  }
 
+  
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

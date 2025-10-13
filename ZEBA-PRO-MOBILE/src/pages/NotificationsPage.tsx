@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
 import HomeHeader from '@/components/HomeHeader';
 import DotAnimation from '@/components/DotAnimation';
+import { useIonRouter } from '@ionic/react';
+
 
 // Define the notification type based on API response
 interface Notification {
@@ -24,6 +26,14 @@ const NotificationsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = import.meta.env.VITE_BASE_URL;
+  const router = useIonRouter();
+
+  const getInitials = (name: string) => {
+  if (!name) return "";
+  const parts = name.split(" ");
+  const initials = parts.map((p) => p[0]).join("");
+  return initials.substring(0, 2).toUpperCase();
+};
 
 
   useEffect(() => {
@@ -57,6 +67,26 @@ const NotificationsPage: React.FC = () => {
       minute: '2-digit',
     });
   };
+
+  const handleNotificationClick = (notification: Notification) => {
+  switch (notification.entityType) {
+    case 1: 
+     router.push(`/timeoff`, 'forward');
+      break;
+    case 2: 
+     router.push(`/attendance`, 'forward');
+      break;
+    // case 3:
+    //   router.push(`/tasks/${notification.entityId}`, 'forward');
+    //   break;
+    // case 4: 
+    //    router.push(`/announcements/${notification.entityId}`, 'forward');
+      break;
+    default:
+      console.log('Unknown notification type:', notification.entityType);
+      break;
+  }
+};
 
   return (
     <IonPage>
@@ -100,15 +130,20 @@ const NotificationsPage: React.FC = () => {
                       <li 
                         key={notification.id} 
                         className={`px-6 py-4 flex items-start ${notification.read ? '' : 'bg-gray-50'}`}
+                         onClick={() => handleNotificationClick(notification)}
                       >
                         <div className="flex-shrink-0 mr-4">
-                          <img
-                            src={notification.imageURL
-                              ? `${notification.imageURL}` 
-                              : "https://png.pngtree.com/png-vector/20250117/ourlarge/pngtree-friendly-and-professional-male-avatar-in-a-blue-suit-red-tie-png-image_15236012.png"}
-                            alt={`${notification.actorName}`}
-                            className="h-10 w-10 rounded-full "
-                          />
+                         {notification.imageURL ? (
+  <img
+    src={notification.imageURL}
+    alt={notification.actorName}
+    className="h-10 w-10 rounded-full"
+  />
+) : (
+  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">
+    {getInitials(notification.actorName)}
+  </div>
+)}
                         </div>
                         
                         <div className="flex-1 min-w-0">

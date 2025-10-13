@@ -76,9 +76,12 @@ const PayslipPage: React.FC = () => {
           const result = await Filesystem.writeFile({
             path: filename,
             data: base64Data,
-            directory: Directory.Documents, // or Directory.External for Android Downloads folder
+             directory: Directory.Data, // or Directory.External for Android Downloads folder
           });
-
+const externalUri = await Filesystem.getUri({
+  path: filename,
+  directory: Directory.Data,
+});
           console.log('File saved at:', result.uri);
 
           // Option 1: Share the file (recommended for better UX)

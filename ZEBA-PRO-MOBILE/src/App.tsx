@@ -23,6 +23,7 @@ import TabNavigation from './components/TabNavigation';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import SplashScreen from './components/SplashScreen';
 import { createAnimation, Animation } from '@ionic/react';
+import { useIonRouter } from '@ionic/react';
 
 /* Core Ionic CSS */
 import '@ionic/react/css/core.css';
@@ -47,6 +48,7 @@ import './index.css';
 import { notificationService } from './services/notification-service';
 import TenantListPage from './components/TenantListPage';
 import HomeHeader from './components/HomeHeader';
+import LoadingSmiley from './components/Loader';
 
 // Initialize Ionic React with proper config
 setupIonicReact({
@@ -81,6 +83,9 @@ const AppContent: React.FC = () => {
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
  const [isModalOpen, setIsModalOpen] = useState(false);
+const { isLoading } = useAuth();
+  const router = useIonRouter();
+  
   useEffect(() => {
     // Check if app has launched before
     const hasLaunchedBefore = localStorage.getItem('appLaunchedBefore');
@@ -104,6 +109,8 @@ const AppContent: React.FC = () => {
     const interval = setInterval(fetchNotificationsCount, 300000); // Refresh every 5 minutes
     return () => clearInterval(interval);
   }, [user]);
+
+
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -239,9 +246,7 @@ const AppContent: React.FC = () => {
 
   return (
     <IonPage className="app-container flex flex-col h-screen">
-      {showSplash ? (
-        <SplashScreen onComplete={handleSplashComplete} />
-      ) : (
+   
         <>
           <Toaster
             position="bottom-center"
@@ -353,7 +358,7 @@ const AppContent: React.FC = () => {
   </div>
 )}
         </>
-      )}
+   
     </IonPage>
   );
 };
@@ -362,13 +367,15 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
+        
           <IonApp className="ion-app-safe">
             <IonReactRouter>
+              <AuthProvider>
               <AppContent />
+              </AuthProvider>
             </IonReactRouter>
           </IonApp>
-        </AuthProvider>
+        
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -36,6 +36,8 @@ export interface LoginResponse {
 }
 
 export interface User {
+  lastName: any;
+  firstName: any;
   id: any;
   name: string;
   email: string;
@@ -62,7 +64,9 @@ export const authService = {
           position: userData.designaton || undefined,
           department: userData.departmentName || undefined,
           profileUrl: userData.profileUrl || undefined,
-          imageUrl: userData.profileUrl || undefined, // Add this field for HomeHeader component
+          imageUrl: userData.profileUrl || undefined, 
+          firstName: userData.firstName, 
+          lastName: userData.lastName,   
         };
         
         // Store token and user info in localStorage
@@ -92,6 +96,8 @@ export const authService = {
           department: userData.departmentName || undefined,
           profileUrl: userData.profileUrl || undefined,
           imageUrl: userData.profileUrl || undefined,
+          firstName: userData.firstName, 
+          lastName: userData.lastName,  
         };
         
         localStorage.setItem('auth_token', userData.token);
@@ -119,6 +125,8 @@ export const authService = {
           department: userData.departmentName || undefined,
           profileUrl: userData.profileUrl || undefined,
           imageUrl: userData.profileUrl || undefined,
+          firstName: userData.firstName, 
+          lastName: userData.lastName,   
         };
         
         localStorage.setItem('auth_token', userData.token);
@@ -150,7 +158,13 @@ export const authService = {
     // Try to get user from localStorage first
     const userStr = localStorage.getItem('user');
     if (userStr) {
-      return Promise.resolve(JSON.parse(userStr));
+      const user = JSON.parse(userStr);
+      
+      if (!user.name && (user.firstName || user.lastName)) {
+        user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      }
+      
+      return Promise.resolve(user);
     }
     
     // If not in localStorage, fetch from API

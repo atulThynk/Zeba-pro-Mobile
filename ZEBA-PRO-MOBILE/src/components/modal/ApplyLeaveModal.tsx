@@ -15,6 +15,7 @@ import { toast } from '@/hooks/use-toast';
 import { AxiosError } from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIonRouter } from '@ionic/react';
+import { Check } from "lucide-react";
 
 interface LeaveFormData {
   leaveTypeId: string;
@@ -308,26 +309,57 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
                   {errors.startDate && (
                     <p className="text-xs text-red-500">{errors.startDate.message}</p>
                   )}
-                  <div className="grid grid-cols-2 gap-3 mt-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="startFirstHalf"
-                        checked={watch('startFirstHalf')}
-                        onCheckedChange={(checked) => setValue('startFirstHalf', !!checked)}
-                        className="h-4 w-4 border-2 !bg-gray-300   rounded data-[state=checked]:bg-blue-200 data-[state=checked]:border-blue-500"
-                      />
-                      <label htmlFor="startFirstHalf" className="text-xs font-medium text-gray-700">First Half</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="startSecondHalf"
-                        checked={watch('startSecondHalf')}
-                        onCheckedChange={(checked) => setValue('startSecondHalf', !!checked)}
-                        className="h-4 w-4 border-2 !bg-gray-300   rounded data-[state=checked]:bg-blue-200 data-[state=checked]:border-blue-500"
-                      />
-                      <label htmlFor="startSecondHalf" className="text-xs font-medium text-gray-700">Second Half</label>
-                    </div>
-                  </div>
+              
+
+<div className="grid grid-cols-2 gap-3 mt-2">
+  <div className="flex items-center space-x-2">
+    <button
+      type="button"
+      onClick={() => setValue('startFirstHalf', !watch('startFirstHalf'))}
+      className={`h-4 w-4 flex items-center justify-center rounded border transition-all duration-150
+        ${watch('startFirstHalf')
+          ? ' border-blue-500'
+          : 'bg-white border-gray-200'
+        }`}
+      style={{ borderWidth: '2px', borderStyle: 'solid' }}
+    >
+      {watch('startFirstHalf') && (
+        <Check className="h-3.5 w-3.5 text-blue-600" strokeWidth={3} />
+      )}
+    </button>
+    <label
+      htmlFor="startFirstHalf"
+      className="text-xs font-medium text-gray-700 select-none"
+      onClick={() => setValue('startFirstHalf', !watch('startFirstHalf'))}
+    >
+      First Half
+    </label>
+  </div>
+  <div className="flex items-center space-x-2">
+    <button
+      type="button"
+      onClick={() => setValue('startSecondHalf', !watch('startSecondHalf'))}
+      className={`h-4 w-4 flex items-center justify-center rounded border transition-all duration-150
+        ${watch('startSecondHalf')
+          ? ' border-blue-500'
+          : 'bg-white border-gray-200'
+        }`}
+      style={{ borderWidth: '2px', borderStyle: 'solid' }}
+    >
+      {watch('startSecondHalf') && (
+        <Check className="h-3.5 w-3.5 text-blue-600" strokeWidth={3} />
+      )}
+    </button>
+    <label
+      htmlFor="startSecondHalf"
+      className="text-xs font-medium text-gray-700 select-none"
+      onClick={() => setValue('startSecondHalf', !watch('startSecondHalf'))}
+    >
+      Second Half
+    </label>
+  </div>
+</div>
+
                 </div>
 
                 {/* End Date */}
@@ -357,24 +389,48 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
                     className="h-12 border-2 border-gray-200 bg-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   />
                   <div className="grid grid-cols-2 gap-3 mt-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="endFirstHalf"
-                        checked={watch('endFirstHalf')}
-                        onCheckedChange={(checked) => setValue('endFirstHalf', !!checked)}
-                        className="h-4 w-4 border-2 !bg-gray-300   rounded data-[state=checked]:bg-blue-200 data-[state=checked]:border-blue-500"
-                      />
-                      <label htmlFor="endFirstHalf" className="text-xs font-medium text-gray-700">First Half</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="endSecondHalf"
-                        checked={watch('endSecondHalf')}
-                        onCheckedChange={(checked) => setValue('endSecondHalf', !!checked)}
-                        className="h-4 w-4 border-2 !bg-gray-300   rounded data-[state=checked]:bg-blue-200 data-[state=checked]:border-blue-500"
-                      />
-                      <label htmlFor="endSecondHalf" className="text-xs font-medium text-gray-700">Second Half</label>
-                    </div>
+    <div className="flex items-center space-x-2">
+  <button
+    type="button"
+    onClick={() => setValue('endFirstHalf', !watch('endFirstHalf'))}
+    className={`h-4 w-4 flex items-center justify-center rounded border-2 transition-all duration-150
+      ${watch('endFirstHalf')
+        ? 'bg border-blue-500'
+        : 'bg-white border-gray-200'
+      }`}
+   style={{ borderWidth: '2px', borderStyle: 'solid' }}
+  >
+    {watch('endFirstHalf') && <Check className="h-3.5 w-3.5 text-blue-600" strokeWidth={3} />}
+  </button>
+  <label
+    htmlFor="endFirstHalf"
+    className="text-xs font-medium text-gray-700 select-none"
+    onClick={() => setValue('endFirstHalf', !watch('endFirstHalf'))}
+  >
+    First Half
+  </label>
+</div>
+            <div className="flex items-center space-x-2 mt-2">
+  <button
+    type="button"
+    onClick={() => setValue('endSecondHalf', !watch('endSecondHalf'))}
+    className={`h-4 w-4 flex items-center justify-center rounded border-2 transition-all duration-150
+      ${watch('endSecondHalf')
+        ? ' border-blue-500'
+        : 'bg-white border-gray-200'
+      }`}
+    style={{ borderWidth: '2px', borderStyle: 'solid' }}
+  >
+    {watch('endSecondHalf') && <Check className="h-3.5 w-3.5 text-blue-600" strokeWidth={3} />}
+  </button>
+  <label
+    htmlFor="endSecondHalf"
+    className="text-xs font-medium text-gray-700 select-none"
+    onClick={() => setValue('endSecondHalf', !watch('endSecondHalf'))}
+  >
+    Second Half
+  </label>
+</div>
                   </div>
                 </div>
 
@@ -456,12 +512,15 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
                         <div className="p-2">
                           {users.data.map((user: BasicUser) => (
                             <div key={user.id} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg">
-                              <Checkbox
-                                id={`user-${user.id}`}
-                                checked={selectedUsers.includes(user.id)}
-                                onCheckedChange={() => handleUserSelect(user.id)}
-                                className="h-4 w-4 border-2 border-gray-300 bg-white rounded data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-                              />
+                              <div
+    onClick={() => handleUserSelect(user.id)}
+    className={`h-4 w-4 rounded border border-gray-300 bg-gray-100 flex items-center justify-center cursor-pointer transition-all 
+      ${selectedUsers.includes(user.id) ? "border-blue-500 bg-white" : ""}`}
+    >
+    {selectedUsers.includes(user.id) && (
+      <Check className="h-3 w-3 text-blue-500" strokeWidth={3} />
+    )}
+  </div>
                               <label htmlFor={`user-${user.id}`} className="text-sm font-medium text-gray-900 flex-1 cursor-pointer">
                                 {user.firstName} {user.lastName}
                               </label>
@@ -502,7 +561,7 @@ const ApplyLeaveModal: React.FC<ApplyLeaveModalProps> = ({ isOpen, onClose, leav
               </form>
 
               {/* Footer */}
-              <div className="px-4 py-4 mb-8 border-t border-gray-100 bg-white">
+              <div className="px-4 py-4 mb-12 border-t border-gray-100 bg-white">
                 <div className="flex gap-3">
                   <Button
                     type="button"

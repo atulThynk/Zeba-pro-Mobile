@@ -540,10 +540,10 @@ const startRef = useRef<HTMLDivElement>(null);
                           Status
                         </th>
                         <th className="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Time In
+                          First In
                         </th>
-                        <th className="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                          Time Out
+                        <th className="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Last Out
                         </th>
                         <th className="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Total Hours

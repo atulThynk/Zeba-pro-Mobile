@@ -24,13 +24,14 @@ interface HomeHeaderProps {
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick , onModalStateChange}) => {
   const { user, logout } = useAuth();
-const [finalImageUrl, setFinalImageUrl] = useState<string>('');
-  
+  const [finalImageUrl, setFinalImageUrl] = useState<string>('');
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
   const router = useIonRouter();
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTenantModalOpen, setIsTenantModalOpen] = useState(false);
-  const [fetchedUser, setFetchedUser] = useState<UserProfile | null>(null);
   const [fetchedTenant, setFetchedTenant] = useState<Tenant | null>(null);
   const [allTenants, setAllTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,34 +41,33 @@ const [finalImageUrl, setFinalImageUrl] = useState<string>('');
   let tenantLogo = localStorage.getItem('tenantLogo');
   const tenantName = localStorage.getItem('tenantName');
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const userData =JSON.parse(localStorage.getItem('user') || '{}');
   const [tenantLogoError, setTenantLogoError] = useState(false);
-  const preloadImage = (src?: string) => {
-  if (!src) return;
-  const img = new Image();
-  img.src = src;
-};
 
- useEffect(() => {
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user?.id) return;
 
-  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const imageUrl =
-    fetchedUser?.imageUrl?.trim() ||
-    user?.imageUrl?.trim() ||
-    storedUser?.imageUrl?.trim() ||
-    '';
+      try {
+        const profile = await userService.getUserProfile(user.id);
+        setUserProfile(profile);
+        
+        // Set the image URL from profile
+        if (profile?.imageUrl) {
+          setFinalImageUrl(profile.imageUrl);
+          const img = new Image();
+          img.onload = () => setImageLoaded(true);
+          img.onerror = () => setImageLoaded(false);
+          img.src = profile.imageUrl;
+        }
+      } catch (error) {
+        console.error('Failed to fetch user profile in HomeHeader:', error);
+      }
+    };
 
-  if (imageUrl) {
-    setFinalImageUrl(imageUrl);
-    const img = new Image();
-    img.src = imageUrl;
-  } else {
-    setFinalImageUrl('');
-  }
-}, [fetchedUser, user]);
+    fetchUserProfile();
+  }, [user?.id]);
 
-
-useEffect(() => {
+  useEffect(() => {
     const anyModalOpen = isModalOpen || isTenantModalOpen;
     if (onModalStateChange) {
       onModalStateChange(anyModalOpen);
@@ -115,29 +115,6 @@ useEffect(() => {
             variant: 'destructive',
             title: 'Error',
             description: 'Failed to load tenant profile data after retries.',
-          });
-        }
-      }
-
-      if (!user.name && user.id) {
-        try {
-          const userData = await userService.getUserProfile(user.id.toString());
-          localStorage.setItem('userData', JSON.stringify(userData));
-          const fullName = `${userData.firstName} ${userData.lastName || ''}`.trim();
-          setFetchedUser({
-            ...userData,
-            name: fullName || 'Unknown User',
-          } as UserProfile & { name: string });
-        } catch (error) {
-          console.error('Failed to fetch user data:', error);
-          if (retryCount < maxRetries) {
-            setTimeout(() => fetchUserData(retryCount + 1, maxRetries), 1000);
-            return;
-          }
-          toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Failed to load user profile data after retries.',
           });
         }
       }
@@ -307,6 +284,11 @@ useEffect(() => {
   );
   const sortedTenants = [...filteredTenants].sort((a, b) => Number(b.isActive) - Number(a.isActive));
 
+  // Get display name
+  const displayName = userProfile 
+    ? `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim()
+    : user?.name || 'User';
+
   return (
     <div className="relative">
       <AnimatePresence>
@@ -333,22 +315,34 @@ useEffect(() => {
       >
         <header className="flex justify-between items-center px-4 py-3 bg-white">
           <div className="flex items-center">
-<Avatar
-  className="h-10 w-10 mr-3 cursor-pointer transition-transform active:scale-95"
-  onClick={() => setIsModalOpen(true)}
->
-  {finalImageUrl ? (
-    <AvatarImage src={finalImageUrl} alt={user?.name || 'User'} />
-  ) : (
-    <AvatarFallback className="bg-blue-500 text-white font-semibold">
-      {user?.name
-        ? getInitials(user.name)
-        : userData?.firstName
-        ? getInitials(`${userData.firstName} ${userData.lastName || ''}`)
-        : 'U'}
-    </AvatarFallback>
-  )}
-</Avatar>
+            <Avatar
+              className="h-10 w-10 mr-3 cursor-pointer transition-transform active:scale-95 bg-gray-200 overflow-hidden"
+              onClick={() => setIsModalOpen(true)}
+            >
+              {finalImageUrl ? (
+                <>
+                  <AvatarImage
+                    src={finalImageUrl}
+                    alt={displayName}
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => {
+                      console.error('Image failed to load:', finalImageUrl);
+                      setImageLoaded(false);
+                    }}
+                    className={`${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+                  />
+                  {!imageLoaded && (
+                    <AvatarFallback className="bg-gray-300 text-gray-700 font-semibold">
+                      {getInitials(displayName)}
+                    </AvatarFallback>
+                  )}
+                </>
+              ) : (
+                <AvatarFallback className="bg-gray-300 text-gray-700 font-semibold">
+                  {getInitials(displayName)}
+                </AvatarFallback>
+              )}
+            </Avatar>
           </div>
 
           <div className="flex items-center relative">
@@ -387,55 +381,63 @@ useEffect(() => {
       </div>
 
       {/* Profile Modal */}
-     <AnimatePresence>
+      <AnimatePresence>
         {isModalOpen && (
-            <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[999]"
-      onClick={() => setIsModalOpen(false)} 
-    >
           <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed top-0 left-0 bottom-0 z-[1000] bg-white shadow-2xl"
-            style={{ width: '85vw', maxWidth: '400px' }}
-             onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[999]"
+            onClick={() => setIsModalOpen(false)}
           >
-            <div className="flex flex-col h-full">
-              {/* Profile Header */}
-              <div className="px-6 pt-16 pb-6">
-                <div className="flex items-center justify-between mb-6">
-                <Avatar className="h-16 w-16">
-  {finalImageUrl ? (
-    <AvatarImage src={finalImageUrl} alt={user?.name || 'User'} />
-  ) : (
-    <AvatarFallback className="text-xl text-black bg-blue-500">
-      {user?.name
-        ? getInitials(user.name)
-        : userData?.firstName
-        ? getInitials(`${userData.firstName} ${userData.lastName || ''}`)
-        : 'U'}
-    </AvatarFallback>
-  )}
-</Avatar>
-                
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed top-0 left-0 bottom-0 z-[1000] bg-white shadow-2xl"
+              style={{ width: '70vw', maxWidth: '400px' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col h-full">
+                {/* Profile Header */}
+                <div className="px-6 pt-16 pb-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <Avatar className="h-16 w-16 relative overflow-hidden bg-gray-200">
+                      {finalImageUrl ? (
+                        <>
+                          <AvatarImage
+                            src={finalImageUrl}
+                            alt={displayName}
+                            onLoad={() => setImageLoaded(true)}
+                            className={`transition-opacity duration-300 ${
+                              imageLoaded ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          />
+                          {!imageLoaded && (
+                            <AvatarFallback className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-500 text-xl">
+                              {getInitials(displayName)}
+                            </AvatarFallback>
+                          )}
+                        </>
+                      ) : (
+                        <AvatarFallback className="bg-gray-200 text-gray-500 text-xl">
+                          {getInitials(displayName)}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </div>
+
+                  <div>
+                    <h3 className="text-black font-bold text-xl mb-1">
+                      {displayName}
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-1">
+                      {user?.email || userProfile?.email || 'user@example.com'}
+                    </p>
+                  </div>
                 </div>
-                
-                <div>
-                  <h3 className="text-black font-bold text-xl mb-1">
-                    {userData?.firstName + " " + userData?.lastName || 'User'}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-1">
-                    {user?.email || 'user@example.com'}
-                  </p>
-                
-                </div>
-              </div>
 
               {/* Menu Items */}
               <div className="flex-1 overflow-auto">
@@ -520,7 +522,6 @@ useEffect(() => {
                   )}
                   {sortedTenants.map((tenant) => {
                     const isCurrent = user?.currentTenantId === tenant.id;
-                    console.log('C',isCurrent,'A',user?.currentTenantId,'B',tenant.id,'E',user)
                     const isActive = tenant.isActive;
                     const isLoading = tenantLoadingId === tenant.id && loading;
 

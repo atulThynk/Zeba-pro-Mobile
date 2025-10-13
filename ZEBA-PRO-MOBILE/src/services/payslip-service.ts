@@ -76,7 +76,7 @@ export const payslipService = {
     try {
       const url = `/Payroll/payslip/download?month=${month}&year=${year}&userId=1`;
       const apiUrl = import.meta.env.VITE_BASE_URL;
-      const response = await fetch(`${apiUrl}/${url}`, { 
+      const response = await fetch(`${apiUrl}${url}`, { 
         method: 'GET',
         headers: {
           'Accept': 'application/pdf',

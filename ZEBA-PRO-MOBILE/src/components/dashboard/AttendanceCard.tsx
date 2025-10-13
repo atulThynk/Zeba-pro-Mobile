@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, Calendar, TimerReset, Hourglass, Loader2 } from 'lucide-react';
+import { Clock, Calendar, TimerReset, Hourglass, Loader2, MapPin, Settings, X } from 'lucide-react';
 import { attendanceService, AttendanceRecord, CheckInRequest, CheckOutRequest } from '@/services/attendance-service';
 import { formatTime } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { Geolocation } from '@capacitor/geolocation';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import { NativeSettings } from 'capacitor-native-settings';
 
 interface AttendanceCardProps {
   attendance: AttendanceRecord | null;
@@ -22,6 +23,8 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [locationDialogType, setLocationDialogType] = useState<'permission' | 'service'>('permission');
 
   // Update time every second for live session time
   useEffect(() => {
@@ -38,22 +41,14 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
       if (permissionStatus.location === 'granted' || permissionStatus.coarseLocation === 'granted') {
         return true;
       } else {
-        toast({
-          description: 'Location permission denied. Please enable it in settings to use this feature.',
-          variant: 'destructive',
-          duration: 5000,
-         
-        });
+        setLocationDialogType('permission');
+        setShowLocationDialog(true);
         return false;
       }
     } catch (error) {
       console.error('Error requesting location permissions:', error);
-      toast({
-        description: 'Error requesting location permissions. Please check your device settings.',
-        variant: 'destructive',
-        duration: 5000,
-        
-      });
+      setLocationDialogType('permission');
+      setShowLocationDialog(true);
       return false;
     }
   };
@@ -71,22 +66,28 @@ const AttendanceCard: React.FC<AttendanceCardProps> = ({
       };
     } catch (error: any) {
       console.error('Error getting location:', error);
-      let errorMessage = 'Failed to get location. Please try again.';
       
       // Handle specific error codes for better user feedback
       if (error.code === 1) { // PERMISSION_DENIED
-        errorMessage = 'Location permission denied. Please enable it in settings.';
+        setLocationDialogType('permission');
+        setShowLocationDialog(true);
       } else if (error.code === 2) { // POSITION_UNAVAILABLE
-        errorMessage = 'Location services are unavailable. Please enable location services in your device settings.';
+        setLocationDialogType('service');
+        setShowLocationDialog(true);
       } else if (error.code === 3) { // TIMEOUT
-        errorMessage = 'Location request timed out. Please try again.';
+        toast({
+          description: 'Location request timed out. Please try again.',
+          variant: 'destructive',
+          duration: 5000,
+        });
+      } else {
+        toast({
+          description: 'Failed to get location. Please try again.',
+          variant: 'destructive',
+          duration: 5000,
+        });
       }
       
-      toast({
-        description: errorMessage,
-        variant: 'destructive',
-        duration: 5000,
-      });
       return null;
     }
   };
@@ -183,75 +184,170 @@ const getCurrentSessionTime = (): string => {
   
 
   const isCheckedIn = getCurrentSessionTime() !== "00:00:00";
+const openDeviceSettings = async () => {
+  try {
+    setShowLocationDialog(false);
+
+    const platform = Capacitor.getPlatform();
+
+    if (platform === 'android' || platform === 'ios') {
+      await (NativeSettings as any).open({
+       
+  optionAndroid: 'location', 
+  optionIOS: 'location',  
+}); 
+     
+      console.log('Opened device location settings');
+    } else {
+      console.warn('NativeSettings not supported on web');
+      toast({
+        description: 'Settings opening is only supported on mobile devices.',
+        duration: 4000,
+      });
+    }
+  } catch (error) {
+    console.error('Failed to open settings:', error);
+    toast({
+      description: 'Please enable location manually: Settings → Location → Turn ON',
+      variant: 'destructive',
+      duration: 5000,
+    });
+  }
+};
+
 
   return (
-    <Card className="border-gray-100 bg-white mb-6 overflow-hidden rounded-xl">
-      <CardHeader className="flex justify-center items-center py-4 border-gray-100 bg-white">
-        <CardTitle className="text-lg font-medium flex items-center text-gray-800">
-          Today's Attendance
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="grid grid-cols-2 mb-3">
-          <div className="text-center p-4 border-gray-100 bg-white rounded-lg">
-            <div className="flex items-center justify-center mb-2">
-              <TimerReset size={20} className="text-emerald-500 mr-2" />
-              <p className="text-sm font-medium text-gray-600">Total Hours</p>
+    <>
+      {/* Permission Modal */}
+      {showLocationDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowLocationDialog(false)}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 z-10">
+            {/* Close button */}
+            <button
+              onClick={() => setShowLocationDialog(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Icon */}
+            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full">
+              {locationDialogType === 'permission' ? (
+                <MapPin className="w-8 h-8 text-amber-600" />
+              ) : (
+                <Settings className="w-8 h-8 text-amber-600" />
+              )}
             </div>
-            {isDataLoading ? (
-              <div className="flex items-center justify-center">
-                <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
-              </div>
-            ) : (
-              <p className="text-xl font-semibold text-gray-800">
-                {formatTotalHours(attendance?.totalHours)}
-              </p>
-            )}
-          </div>
-          <div className="text-center p-4 bg-white rounded-lg">
-            <div className="flex items-center justify-center mb-2">
-              <Hourglass size={20} className="text-blue-500 mr-2" />
-              <p className="text-sm font-medium text-gray-600">Session Time</p>
+
+            {/* Title */}
+            <h3 className="text-xl font-semibold text-gray-900 text-center mb-3">
+              {locationDialogType === 'permission' 
+                ? 'Location Permission Required' 
+                : 'Location Services Disabled'}
+            </h3>
+
+            {/* Description */}
+            <p className="text-gray-600 text-center mb-6 leading-relaxed">
+              {locationDialogType === 'permission' 
+                ? 'This app needs location access to record your attendance accurately. Please enable location permission in your device settings.' 
+                : 'Location services are currently disabled on your device. Please enable them in your device settings to continue.'}
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={openDeviceSettings}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+              >
+                <Settings size={18} />
+                Open Settings
+              </button>
+              <button
+                onClick={() => setShowLocationDialog(false)}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+              >
+                Cancel
+              </button>
             </div>
-            {isDataLoading ? (
-              <div className="flex items-center justify-center">
-                <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
-              </div>
-            ) : (
-              <p className="text-xl font-semibold text-gray-800">
-                {getCurrentSessionTime()}
-              </p>
-            )}
           </div>
         </div>
-        <div className="w-full flex justify-center text-right items-right mb-3">
-          {isDataLoading ? (
-            <div className="w-32 py-2 flex items-center justify-center bg-gray-300 rounded-full">
-              <Loader2 className="animate-spin h-4 w-4 text-gray-500 mr-2" />
-              <span className="text-sm text-gray-500">Loading...</span>
-            </div>
-          ) : (
-            <Button 
-              onClick={handleCheckInOut}
-              disabled={isLoading}
-              className={`w-32 py-2 transition-all duration-300 ${
-                isCheckedIn 
-                  ? 'bg-rose-400 hover:bg-rose-500 focus:ring-rose-300' 
-                  : 'bg-emerald-400 hover:bg-emerald-500 focus:ring-emerald-300'
-              } text-white font-medium rounded-full focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              {isLoading ? (
+      )}
+
+      <Card className="border-gray-100 bg-white mb-6 overflow-hidden rounded-xl">
+        <CardHeader className="flex justify-center items-center py-4 border-gray-100 bg-white">
+          <CardTitle className="text-lg font-medium flex items-center text-gray-800">
+            Today's Attendance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="grid grid-cols-2 mb-3">
+            <div className="text-center p-4 border-gray-100 bg-white rounded-lg">
+              <div className="flex items-center justify-center mb-2">
+                <TimerReset size={20} className="text-emerald-500 mr-2" />
+                <p className="text-sm font-medium text-gray-600">Total Hours</p>
+              </div>
+              {isDataLoading ? (
                 <div className="flex items-center justify-center">
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
                 </div>
               ) : (
-                isCheckedIn ? 'Check Out' : 'Check In'
+                <p className="text-xl font-semibold text-gray-800">
+                  {formatTotalHours(attendance?.totalHours)}
+                </p>
               )}
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            </div>
+            <div className="text-center p-4 bg-white rounded-lg">
+              <div className="flex items-center justify-center mb-2">
+                <Hourglass size={20} className="text-blue-500 mr-2" />
+                <p className="text-sm font-medium text-gray-600">Session Time</p>
+              </div>
+              {isDataLoading ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="animate-spin h-5 w-5 text-gray-400" />
+                </div>
+              ) : (
+                <p className="text-xl font-semibold text-gray-800">
+                  {getCurrentSessionTime()}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="w-full flex justify-center text-right items-right mb-3">
+            {isDataLoading ? (
+              <div className="w-32 py-2 flex items-center justify-center bg-gray-300 rounded-full">
+                <Loader2 className="animate-spin h-4 w-4 text-gray-500 mr-2" />
+                <span className="text-sm text-gray-500">Loading...</span>
+              </div>
+            ) : (
+              <Button 
+                onClick={handleCheckInOut}
+                disabled={isLoading}
+                className={`w-32 py-2 transition-all duration-300 ${
+                  isCheckedIn 
+                    ? 'bg-rose-400 hover:bg-rose-500 focus:ring-rose-300' 
+                    : 'bg-emerald-400 hover:bg-emerald-500 focus:ring-emerald-300'
+                } text-white font-medium rounded-full focus:outline-none focus:ring-2 focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  </div>
+                ) : (
+                  isCheckedIn ? 'Check Out' : 'Check In'
+                )}
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
