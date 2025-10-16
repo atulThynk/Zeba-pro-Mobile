@@ -200,10 +200,8 @@ const ProfilePage: React.FC = () => {
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
          
-          <main className="max-w-5xl mx-auto px-4 pb-20 pt-8">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
-            </div>
+          <main className="max-w-6xl mx-auto px-4 pb-20 mt-[calc(var(--safe-area-inset-top)+70px)]">
+           
 
             {isLoading ? (
               <div className="space-y-8">

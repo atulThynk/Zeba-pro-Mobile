@@ -86,6 +86,7 @@ const AppContent: React.FC = () => {
 const { isLoading } = useAuth();
   const router = useIonRouter();
   
+  
   useEffect(() => {
     // Check if app has launched before
     const hasLaunchedBefore = localStorage.getItem('appLaunchedBefore');
@@ -116,12 +117,11 @@ const { isLoading } = useAuth();
     const initializeApp = async () => {
       if (Capacitor.isNativePlatform()) {
         try {
-          console.log('Initializing native platform...');
+        
 
           // Configure safe area
           const safeAreaInsets = await SafeArea.getSafeAreaInsets();
-          console.log('Safe Area Insets:', safeAreaInsets);
-
+         
           // Apply safe area CSS variables
           document.documentElement.style.setProperty('--safe-area-inset-top', `${safeAreaInsets.insets.top}px`);
           document.documentElement.style.setProperty('--safe-area-inset-bottom', `${safeAreaInsets.insets.bottom}px`);
@@ -131,24 +131,28 @@ const { isLoading } = useAuth();
           // Configure status bar
           await StatusBar.setStyle({ style: Style.Light });
           await StatusBar.setBackgroundColor({ color: '#f8fafc' });
-          await StatusBar.setOverlaysWebView({ overlay: false });
-            const statusBarHeight = safeAreaInsets.insets.top;
-      const existingOverlay = document.getElementById('status-bar-overlay');
-      if (!existingOverlay && statusBarHeight > 0) {
-        const statusBarOverlay = document.createElement('div');
-        statusBarOverlay.id = 'status-bar-overlay';
-        statusBarOverlay.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: ${statusBarHeight}px;
-          background-color: #ffff;
-          z-index: 99999;
-          pointer-events: none;
-        `;
-        document.body.appendChild(statusBarOverlay);
-      }
+          if(Capacitor.getPlatform()=== 'ios'){
+            await StatusBar.setOverlaysWebView({overlay:true})
+          }else{
+            await StatusBar.setOverlaysWebView({overlay:false})
+          }
+      //       const statusBarHeight = safeAreaInsets.insets.top;
+      // const existingOverlay = document.getElementById('status-bar-overlay');
+      // if (!existingOverlay && statusBarHeight > 0) {
+      //   const statusBarOverlay = document.createElement('div');
+      //   statusBarOverlay.id = 'status-bar-overlay';
+      //   statusBarOverlay.style.cssText = `
+      //     position: fixed;
+      //     top: 0;
+      //     left: 0;
+      //     right: 0;
+      //     height: ${statusBarHeight}px;
+      //     background-color: #ffff;
+      //     z-index: 99999;
+      //     pointer-events: none;
+      //   `;
+      //   document.body.appendChild(statusBarOverlay);
+      // }
       
         } catch (error) {
           console.warn('Error configuring native plugins:', error);
@@ -246,6 +250,8 @@ const { isLoading } = useAuth();
 
   return (
     <IonPage className="app-container flex flex-col h-screen">
+     
+  
    
         <>
           <Toaster
@@ -273,9 +279,17 @@ const { isLoading } = useAuth();
             }}
           />
  {user && !authLoading && !isModalOpen && (
-  <IonHeader className="mb-12 transition-all duration-300">
-    <HomeHeader />
-  </IonHeader>
+<IonHeader
+  className="transition-all duration-300 z-[1000]"
+  style={{
+    paddingTop: 'var(--safe-area-inset-top)',
+    background: '#fff',
+    position: 'sticky',
+    top: 0,
+  }}
+>
+  <HomeHeader />
+</IonHeader>
 )}
         
           <div className="flex-1 overflow-y-auto">

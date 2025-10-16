@@ -304,7 +304,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ onProfileClick , onModalStateCh
       </AnimatePresence>
 
       <div
-        id="main-content"
+  
         className="transition-all duration-500 ease-out relative z-40 overflow-hidden"
         style={{
           filter: (isModalOpen || isTenantModalOpen) ? 'blur(2px)' : 'none',

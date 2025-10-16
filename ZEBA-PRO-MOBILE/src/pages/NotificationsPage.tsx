@@ -93,8 +93,9 @@ const NotificationsPage: React.FC = () => {
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
           
-          <main className="max-w-5xl mx-auto pb-20 px-1 sm:px-6 lg:px-8">
-          <div className="px-6 py-4">
+          <main className="max-w-5xl mx-auto  px-1 sm:px-6 lg:px-8 mb-[6rem] mt-[calc(var(--safe-area-inset-top)+56px)]">
+
+          <div className="px-4 py-4">
             <h2 className="text-2xl font-medium text-gray-800">Notifications</h2>
           </div>
             <div className="bg-white">
@@ -129,7 +130,7 @@ const NotificationsPage: React.FC = () => {
                     {notifications.map((notification) => (
                       <li 
                         key={notification.id} 
-                        className={`px-6 py-4 flex items-start ${notification.read ? '' : 'bg-gray-50'}`}
+                        className={`px-4 py-4 flex items-start ${notification.read ? '' : 'bg-gray-50'}`}
                          onClick={() => handleNotificationClick(notification)}
                       >
                         <div className="flex-shrink-0 mr-4">

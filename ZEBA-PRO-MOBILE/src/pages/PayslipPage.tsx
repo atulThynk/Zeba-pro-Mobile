@@ -171,7 +171,8 @@ const externalUri = await Filesystem.getUri({
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white text-gray-800">
          
-          <main className="p-4 max-w-4xl mx-auto pb-32">
+          <main className="p-4 max-w-4xl mx-auto mb-[6rem]  mt-[calc(var(--safe-area-inset-top)+56px)]">
+
             <div className="mb-6">
               <h1 className="text-2xl font-medium text-black">Payslips</h1>
               <p className="text-gray-500">Access and download your monthly payslips</p>

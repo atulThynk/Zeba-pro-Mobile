@@ -324,7 +324,8 @@ const startRef = useRef<HTMLDivElement>(null);
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white">
 
-          <main className="max-w-6xl mx-auto px-4 pb-32 pt-4">
+          <main className="max-w-6xl mx-auto px-4 mb-[6rem] mt-[calc(var(--safe-area-inset-top)+70px)]">
+
          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div>
         <h1 className="text-2xl font-medium text-gray-900">My Attendance</h1>

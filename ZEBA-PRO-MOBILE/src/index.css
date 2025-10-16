@@ -26,7 +26,7 @@
 
 main {
   flex: 1;
-  margin-top: 56px;
+ 
   overflow-y: auto;
   background: #ffffff !important; /* Force white background for main content */
 }
@@ -54,6 +54,7 @@ ion-content, .main-content {
   height: 100vh;
   overflow: hidden;
 }
+
 
 /* Ensure main content is scrollable */
 main {
@@ -116,7 +117,3 @@ nav {
   animation: netflix-logo 1.2s ease-out forwards;
 }
 
-.ion-header {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}

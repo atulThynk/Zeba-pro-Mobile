@@ -162,7 +162,8 @@ useEffect(() => {
       <IonContent fullscreen className="ion-padding-bottom">
         <div className="flex-1 bg-white text-gray-800">
      
-          <main className="p-4 max-w-4xl mx-auto pb-20">
+         <main className="p-4 max-w-4xl mx-auto mb-[6rem] pt-[calc(var(--safe-area-inset-top)+72px)]">
+
             <div className="mb-6 flex justify-between items-center">
               <h1 className="text-2xl font-medium text-black">Time Off</h1>
               <Button
