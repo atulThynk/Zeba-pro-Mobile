@@ -23,7 +23,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
     const completeTimer = setTimeout(() => {
       setIsComplete(true);
       onComplete?.();
-    }, 1000);
+    }, 2000);
 
     return () => {
       clearTimeout(logoTimer);

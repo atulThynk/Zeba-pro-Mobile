@@ -12,7 +12,6 @@
     "lint": "eslint",
     "build:android": "npm run build && npx cap sync android && npx cap copy android && npx cap run android",
     "build:ios": "npm run build && npx cap sync ios && npx cap open ios"
-
   },
   "dependencies": {
     "@capacitor-community/safe-area": "^7.0.0-alpha.1",
@@ -28,7 +27,7 @@
     "@capacitor/keyboard": "7.0.3",
     "@capacitor/push-notifications": "^7.0.3",
     "@capacitor/share": "^7.0.2",
-    "@capacitor/splash-screen": "^7.0.2",
+    "@capacitor/splash-screen": "^7.0.3",
     "@capacitor/status-bar": "7.0.3",
     "@capgo/capacitor-navigation-bar": "^7.1.33",
     "@ionic/react": "^8.7.3",

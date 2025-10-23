@@ -5,12 +5,13 @@ import { Route, Redirect } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { App as CapacitorApp } from '@capacitor/app';
+import { SplashScreen as CapSplashScreen } from '@capacitor/splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { usePushNotifications } from './hooks/usePushNotifications';
 import { TooltipProvider } from './components/ui/tooltip';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import AnimatedLogin from './components/AnimatedLogin';
+import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
 import AttendancePage from './pages/AttendancePage';
@@ -86,16 +87,30 @@ const AppContent: React.FC = () => {
 const { isLoading } = useAuth();
   const router = useIonRouter();
   
-  
+  // Handle initial splash screen
   useEffect(() => {
-    // Check if app has launched before
-    const hasLaunchedBefore = localStorage.getItem('appLaunchedBefore');
-    if (hasLaunchedBefore) {
-      setShowSplash(false);
+    // Hide Capacitor's native splash screen immediately
+    if (Capacitor.isNativePlatform()) {
+      CapSplashScreen.hide();
     }
-    // If not, keep showSplash true and handle setting the flag in handleSplashComplete
-  }, []);
 
+    // Check if app has launched before in this session
+    const hasLaunchedBefore = sessionStorage.getItem('appLaunchedBefore');
+    
+    if (hasLaunchedBefore) {
+      // Skip splash on subsequent page loads in same session
+      setShowSplash(false);
+    } else {
+      // Show splash for minimum duration
+      const timer = setTimeout(() => {
+        sessionStorage.setItem('appLaunchedBefore', 'true');
+        setShowSplash(false);
+      }, 2000); // Adjust duration as needed
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+  
   useEffect(() => {
     const fetchNotificationsCount = async () => {
       if (!user) return; // Skip fetching if not logged in
@@ -110,8 +125,6 @@ const { isLoading } = useAuth();
     const interval = setInterval(fetchNotificationsCount, 300000); // Refresh every 5 minutes
     return () => clearInterval(interval);
   }, [user]);
-
-
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -170,7 +183,6 @@ const { isLoading } = useAuth();
         document.documentElement.style.setProperty('--safe-area-inset-left', '0px');
         document.documentElement.style.setProperty('--safe-area-inset-right', '0px');
       }
-      
 
       // Set viewport height for mobile browsers
       const setViewportHeight = () => {
@@ -197,7 +209,6 @@ const { isLoading } = useAuth();
     initializeApp();
   }, []);
 
-  // Handle push notification initialization status
   useEffect(() => {
     if (isInitialized) {
       console.log('Push notifications ready!');
@@ -207,7 +218,6 @@ const { isLoading } = useAuth();
     }
   }, [isInitialized, error]);
 
-  // Handle app state changes and notification navigation
   useEffect(() => {
     const handleNavigateToAttendance = () => {
       console.log('Navigating to attendance from push notification');
@@ -242,137 +252,129 @@ const { isLoading } = useAuth();
     };
   }, []);
 
-  const handleSplashComplete = () => {
-    // Set flag only on first launch
-    localStorage.setItem('appLaunchedBefore', 'true');
-    setShowSplash(false);
-  };
+  // Show splash screen during initial load
+  if (showSplash) {
+    return (
+      <IonPage>
+        <SplashScreen onComplete={() => setShowSplash(false)} />
+      </IonPage>
+    );
+  }
 
   return (
     <IonPage className="app-container flex flex-col h-screen">
-     
-  
-   
-        <>
-          <Toaster
-            position="bottom-center"
-            containerClassName="toast-container"
-            toastOptions={{
-              duration: 3000,
+      <>
+        <Toaster
+          position="bottom-center"
+          containerClassName="toast-container"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              borderRadius: '8px',
+              color: '#fff',
+              padding: '16px',
+              fontSize: '16px',
+              marginBottom: user ? 'calc(var(--safe-area-inset-bottom, 0px) + 60px)' : 'calc(var(--safe-area-inset-bottom, 0px) + 16px)',
+            },
+            success: {
               style: {
-                borderRadius: '8px',
-                color: '#fff',
-                padding: '16px',
-                fontSize: '16px',
-                marginBottom: user ? 'calc(var(--safe-area-inset-bottom, 0px) + 60px)' : 'calc(var(--safe-area-inset-bottom, 0px) + 16px)', // Adjust for tabs
+                background: '#22c55e',
               },
-              success: {
-                style: {
-                  background: '#22c55e',
-                },
+            },
+            error: {
+              style: {
+                background: '#ef4444',
               },
-              error: {
-                style: {
-                  background: '#ef4444',
-                },
-              },
-            }}
-          />
- {user && !authLoading && !isModalOpen && (
-<IonHeader
-  className="transition-all duration-300 z-[1000]"
-  style={{
-    paddingTop: 'var(--safe-area-inset-top)',
-    background: '#fff',
-    position: 'sticky',
-    top: 0,
-  }}
->
-  <HomeHeader />
-</IonHeader>
-)}
+            },
+          }}
+        />
         
-          <div className="flex-1 overflow-y-auto">
-            <IonRouterOutlet animation={fadeAnimation}>
-              <Route exact path="/login" component={AnimatedLogin} />
-              <Route
-                exact
-                path="/"
-                render={() => (
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                )}
-              />
-              <Route
-                exact
-                path="/attendance"
-                render={() => (
-                  <ProtectedRoute>
-                    <AttendancePage />
-                  </ProtectedRoute>
-                )}
-              />
-              <Route
-                exact
-                path="/timeoff"
-                render={() => (
-                  <ProtectedRoute>
-                     <TimeOffPage onModalStateChange={setIsModalOpen} />
-                  </ProtectedRoute>
-                )}
-              />
-              <Route
-                exact
-                path="/payslips"
-                render={() => (
-                  <ProtectedRoute>
-                    <PayslipPage />
-                  </ProtectedRoute>
-                )}
-              />
-              <Route
-                exact
-                path="/notifications"
-                render={() => (
-                  <ProtectedRoute>
-                    <NotificationsPage />
-                  </ProtectedRoute>
-                )}
-              />
-              <Route
-                exact
-                path="/profile"
-                render={() => (
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                )}
-              />
-              {/* <Route
-                exact
-                path="/tenants"
-                render={() => (
-                  <ProtectedRoute>
-                    <TenantListPage />
-                  </ProtectedRoute>
-                )}
-              /> */}
-              <Route exact path="/index.html" render={() => <Redirect to="/" />} />
-              <Route component={NotFound} />
-            </IonRouterOutlet>
+        {user && !authLoading && !isModalOpen && (
+          <IonHeader
+            className="transition-all duration-300 z-[1000]"
+            style={{
+              paddingTop: 'var(--safe-area-inset-top)',
+              background: '#fff',
+              position: 'sticky',
+              top: 0,
+            }}
+          >
+            <HomeHeader />
+          </IonHeader>
+        )}
+      
+        <div className="flex-1 overflow-y-auto">
+          <IonRouterOutlet animation={fadeAnimation}>
+            <Route exact path="/login" component={LoginPage} />
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              exact
+              path="/attendance"
+              render={() => (
+                <ProtectedRoute>
+                  <AttendancePage />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              exact
+              path="/timeoff"
+              render={() => (
+                <ProtectedRoute>
+                  <TimeOffPage onModalStateChange={setIsModalOpen} />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              exact
+              path="/payslips"
+              render={() => (
+                <ProtectedRoute>
+                  <PayslipPage />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              exact
+              path="/notifications"
+              render={() => (
+                <ProtectedRoute>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              )}
+            />
+            <Route
+              exact
+              path="/profile"
+              render={() => (
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              )}
+            />
+            <Route exact path="/index.html" render={() => <Redirect to="/" />} />
+            <Route component={NotFound} />
+          </IonRouterOutlet>
+        </div>
+        
+        {user && !authLoading && (
+          <div
+            className={`transition-all duration-300 ${
+              isModalOpen ? 'opacity-0 pointer-events-none translate-y-full' : 'opacity-100 translate-y-0'
+            }`}
+          >
+            <TabNavigation unreadNotificationsCount={unreadNotificationsCount} />
           </div>
-          {user && !authLoading && (
-  <div
-    className={`transition-all duration-300 ${
-      isModalOpen ? 'opacity-0 pointer-events-none translate-y-full' : 'opacity-100 translate-y-0'
-    }`}
-  >
-    <TabNavigation unreadNotificationsCount={unreadNotificationsCount} />
-  </div>
-)}
-        </>
-   
+        )}
+      </>
     </IonPage>
   );
 };
@@ -381,15 +383,13 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        
-          <IonApp className="ion-app-safe">
-            <IonReactRouter>
-              <AuthProvider>
+        <IonApp className="ion-app-safe">
+          <IonReactRouter>
+            <AuthProvider>
               <AppContent />
-              </AuthProvider>
-            </IonReactRouter>
-          </IonApp>
-        
+            </AuthProvider>
+          </IonReactRouter>
+        </IonApp>
       </TooltipProvider>
     </QueryClientProvider>
   );
